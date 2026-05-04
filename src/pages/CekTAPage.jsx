@@ -1,107 +1,12 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 import {
   Search, FileText, Zap, AlertCircle, ChevronDown,
   BookOpen, Calendar, User, TrendingUp, BarChart2, CheckCircle2, Info
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import './CekTAPage.css';
-
-// ============================================================
-// DUMMY DATA — simulasi hasil backend SBERT + Cosine Similarity
-// ============================================================
-const DUMMY_RESULTS = {
-  high: {
-    score: 87,
-    label: 'Tinggi',
-    color: 'danger',
-    description: 'Topik TA Anda memiliki kemiripan yang sangat tinggi dengan beberapa TA sebelumnya. Disarankan untuk merevisi atau mempersempit fokus penelitian.',
-    matches: [
-      {
-        rank: 1,
-        nim: '1810953021',
-        nama: 'Dicky Maulana',
-        judul: 'Implementasi Sentence-BERT untuk Deteksi Plagiarisme Tugas Akhir pada Perguruan Tinggi',
-        tahun: 2022,
-        prodi: 'Sistem Informasi',
-        similarity: 87,
-        keywords: ['SBERT', 'Deteksi Plagiarisme', 'Tugas Akhir', 'NLP'],
-      },
-      {
-        rank: 2,
-        nim: '1910953008',
-        nama: 'Rahmi Aulia Putri',
-        judul: 'Penggunaan Cosine Similarity dan TF-IDF dalam Sistem Pendeteksi Kemiripan Penelitian Skripsi',
-        tahun: 2023,
-        prodi: 'Sistem Informasi',
-        similarity: 74,
-        keywords: ['Cosine Similarity', 'TF-IDF', 'Pendeteksi Kemiripan', 'Skripsi'],
-      },
-      {
-        rank: 3,
-        nim: '2010953033',
-        nama: 'Arif Hidayat',
-        judul: 'Klasifikasi Topik Penelitian Mahasiswa Menggunakan Metode NLP berbasis Transformer',
-        tahun: 2023,
-        prodi: 'Sistem Informasi',
-        similarity: 61,
-        keywords: ['NLP', 'Transformer', 'Klasifikasi Topik', 'BERT'],
-      },
-    ],
-  },
-  medium: {
-    score: 52,
-    label: 'Sedang',
-    color: 'warning',
-    description: 'Topik TA Anda memiliki kemiripan sedang dengan beberapa TA sebelumnya. Pastikan perbedaan yang signifikan dalam metodologi atau studi kasus.',
-    matches: [
-      {
-        rank: 1,
-        nim: '1910953042',
-        nama: 'Siti Nurfadilah',
-        judul: 'Sistem Rekomendasi Topik Penelitian Menggunakan Word Embedding dan Cosine Similarity',
-        tahun: 2023,
-        prodi: 'Sistem Informasi',
-        similarity: 52,
-        keywords: ['Word Embedding', 'Cosine Similarity', 'Rekomendasi', 'NLP'],
-      },
-      {
-        rank: 2,
-        nim: '2010953017',
-        nama: 'Fajar Ramadhan',
-        judul: 'Analisis Sentimen Judul Penelitian Mahasiswa dengan Metode Deep Learning',
-        tahun: 2022,
-        prodi: 'Sistem Informasi',
-        similarity: 41,
-        keywords: ['Analisis Sentimen', 'Deep Learning', 'Penelitian', 'NLP'],
-      },
-    ],
-  },
-  low: {
-    score: 18,
-    label: 'Rendah',
-    color: 'success',
-    description: 'Topik TA Anda relatif unik dan memiliki tingkat kemiripan yang rendah. Topik Anda berpotensi untuk dilanjutkan ke tahap berikutnya.',
-    matches: [
-      {
-        rank: 1,
-        nim: '2010953055',
-        nama: 'Maya Indah Lestari',
-        judul: 'Pengembangan Sistem Informasi Manajemen Aset Berbasis Web dengan Framework Laravel',
-        tahun: 2023,
-        prodi: 'Sistem Informasi',
-        similarity: 18,
-        keywords: ['Sistem Informasi', 'Manajemen Aset', 'Laravel', 'Web'],
-      },
-    ],
-  },
-};
-
-function getResultKey(title) {
-  const t = title.toLowerCase();
-  if (t.includes('sbert') || t.includes('kemiripan') || t.includes('cosine') || t.includes('similarity') || t.includes('bert')) return 'high';
-  if (t.includes('analisis') || t.includes('sistem') || t.includes('web') || t.includes('data')) return 'medium';
-  return 'low';
-}
 
 function SimilarityGauge({ score, color }) {
   const colors = {
@@ -205,6 +110,9 @@ export default function CekTAPage() {
   const [result, setResult] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
 
+  // Ambil token JWT dari context
+  const { token } = useAuth();
+
   const handleCek = async () => {
     if (!judulTA.trim()) {
       toast.error('Masukkan judul Tugas Akhir terlebih dahulu!');
@@ -218,15 +126,65 @@ export default function CekTAPage() {
     setLoading(true);
     setResult(null);
 
-    // Simulate API delay
-    await new Promise(r => setTimeout(r, 2200));
+    try {
+      // Panggil API Backend menggunakan token
+      const response = await axios.post(
+        'http://localhost:5000/api/ta/cek',
+        { judul_baru: judulTA },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-    const key = getResultKey(judulTA);
-    setResult(DUMMY_RESULTS[key]);
-    setHasSearched(true);
-    setLoading(false);
+      const backendData = response.data;
+      const skor = backendData.skor_kemiripan_tertinggi;
 
-    toast.success('Analisis kemiripan selesai!', { icon: '🔍' });
+      // Logika Penentuan Label & Warna
+      let color, label, description;
+      if (skor >= 70) {
+        color = 'danger';
+        label = 'Tinggi';
+        description = 'Topik TA Anda memiliki kemiripan yang sangat tinggi dengan beberapa TA sebelumnya. Disarankan untuk merevisi atau mempersempit fokus penelitian.';
+      } else if (skor >= 40) {
+        color = 'warning';
+        label = 'Sedang';
+        description = 'Topik TA Anda memiliki kemiripan sedang dengan beberapa TA sebelumnya. Pastikan perbedaan yang signifikan dalam metodologi atau studi kasus.';
+      } else {
+        color = 'success';
+        label = 'Rendah';
+        description = 'Topik TA Anda relatif unik dan memiliki tingkat kemiripan yang rendah. Topik Anda berpotensi untuk dilanjutkan ke tahap berikutnya.';
+      }
+
+      // Format data array rekomendasi dari backend agar sesuai dengan UI MatchCard
+      const formattedMatches = backendData.rekomendasi_mirip.map((item, index) => ({
+        rank: index + 1,
+        nim: 'Data Menyusul', // Backend belum mengirim ini
+        nama: item.penulis,
+        judul: item.judul,
+        tahun: item.tahun,
+        prodi: 'Sistem Informasi',
+        similarity: item.skor,
+        keywords: ['Sistem', 'Informasi'] // Dummy keywords sementara
+      }));
+
+      // Simpan ke state
+      setResult({
+        score: skor,
+        label: label,
+        color: color,
+        description: description,
+        matches: formattedMatches
+      });
+
+      setHasSearched(true);
+      toast.success('Analisis kemiripan selesai!', { icon: '🔍' });
+
+    } catch (error) {
+      console.error(error);
+      const errorMsg = error.response?.data?.pesan || "Gagal menghubungi server backend.";
+      toast.error(errorMsg);
+      setHasSearched(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleReset = () => {
@@ -417,7 +375,7 @@ export default function CekTAPage() {
 
             <div className="match-list">
               {result.matches.map((match, i) => (
-                <MatchCard key={match.nim} match={match} delay={i * 0.1} />
+                <MatchCard key={i} match={match} delay={i * 0.1} />
               ))}
             </div>
           </div>
@@ -445,29 +403,6 @@ export default function CekTAPage() {
             Masukkan judul Tugas Akhir di kolom di atas, lalu klik <strong>"Cek Kemiripan"</strong>
             <br />untuk melihat tingkat kemiripan dengan database TA mahasiswa Sistem Informasi Unand.
           </p>
-          <div className="empty-tips">
-            <div className="empty-tip">
-              <span>🧠</span>
-              <div>
-                <strong>SBERT Embedding</strong>
-                <p>Memahami makna semantik judul, bukan hanya kesamaan kata</p>
-              </div>
-            </div>
-            <div className="empty-tip">
-              <span>📐</span>
-              <div>
-                <strong>Cosine Similarity</strong>
-                <p>Mengukur kemiripan vektor dengan akurasi tinggi</p>
-              </div>
-            </div>
-            <div className="empty-tip">
-              <span>⚡</span>
-              <div>
-                <strong>Analisis Cepat</strong>
-                <p>Hasil dalam hitungan detik dari 2000+ database TA</p>
-              </div>
-            </div>
-          </div>
         </div>
       )}
     </div>

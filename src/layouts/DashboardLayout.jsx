@@ -23,6 +23,13 @@ export default function DashboardLayout() {
     setTimeout(() => { logout(); navigate('/login'); }, 800);
   };
 
+  // PENTING: Proteksi jika data user masih loading/kosong
+  // Fallback (cadangan) agar aplikasi tidak crash
+  const namaUser = user?.nama || 'Mahasiswa';
+  // Ambil inisial untuk avatar cadangan jika tidak ada gambar
+  const inisial = namaUser.charAt(0).toUpperCase(); 
+  const nimUser = user?.username || 'Tidak ada NIM'; // Asumsi username dipakai sebagai NIM
+
   return (
     <div className="dashboard-root">
       {/* Mobile Overlay */}
@@ -50,10 +57,14 @@ export default function DashboardLayout() {
 
         {/* User Mini Card */}
         <div className="sidebar-user-card">
-          <div className="sidebar-avatar">{user.avatar}</div>
+          {/* PERBAIKAN: Gunakan inisial jika avatar tidak ada dari backend */}
+          <div className="sidebar-avatar" style={{ backgroundColor: '#0ea5e9', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+              {user?.avatar || inisial}
+          </div>
           <div className="sidebar-user-info">
-            <span className="sidebar-user-name">{user.nama.split(' ').slice(0, 2).join(' ')}</span>
-            <span className="sidebar-user-nim">{user.nim}</span>
+            {/* PERBAIKAN: Pakai optional chaining dan ambil nama aman */}
+            <span className="sidebar-user-name">{namaUser.split(' ').slice(0, 2).join(' ')}</span>
+            <span className="sidebar-user-nim">{nimUser}</span>
           </div>
           <div className="sidebar-user-status" title="Status aktif">
             <div className="status-dot" />
@@ -123,8 +134,9 @@ export default function DashboardLayout() {
               <Bell size={18} />
               <span className="notif-dot" />
             </button>
-            <div className="topbar-avatar" title={user.nama}>
-              {user.avatar}
+            <div className="topbar-avatar" title={namaUser} style={{ backgroundColor: '#0ea5e9', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+               {/* PERBAIKAN: Gunakan inisial untuk topbar avatar */}
+              {user?.avatar || inisial}
             </div>
           </div>
         </header>

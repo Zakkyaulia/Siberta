@@ -1,4 +1,12 @@
-.cekta-page { display: flex; flex-direction: column; gap: 24px; max-width: 1000px; }
+.cekta-page { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 24px; 
+  width: 100%;       /* Pastikan lebar 100% */
+  max-width: 100%;   /* Ubah 1000px jadi 100% agar penuh */
+  padding: 20px;     /* Opsional: Tambah padding sedikit agar tidak nempel banget ke pinggir layar */
+  box-sizing: border-box; 
+}
 
 /* Header */
 .page-header {

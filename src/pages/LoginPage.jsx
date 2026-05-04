@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext'; // Pastikan path ini sesuai
 import toast from 'react-hot-toast';
 import { Eye, EyeOff, BookOpen, Cpu, Lock, User } from 'lucide-react';
 import './LoginPage.css';
 
-const CREDENTIALS = { username: 'tes123', password: 'tes123' };
-
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login } = useAuth(); // Mengambil fungsi login yang sudah terhubung axios
   const navigate = useNavigate();
   const [form, setForm] = useState({ username: '', password: '' });
   const [showPass, setShowPass] = useState(false);
@@ -28,22 +26,27 @@ export default function LoginPage() {
     if (!validate()) return;
 
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1200)); // simulate API
+    setErrors({}); // Bersihkan error sebelumnya
 
-    if (form.username === CREDENTIALS.username && form.password === CREDENTIALS.password) {
+    // Memanggil API backend melalui fungsi login di AuthContext
+    const result = await login(form.username, form.password);
+
+    if (result.success) {
       toast.success('Login berhasil! Selamat datang 👋', {
         icon: '🎉',
         style: { borderLeft: '4px solid #10b981' },
       });
-      login();
+      // Arahkan ke dashboard profil setelah sukses
       navigate('/dashboard/profil');
     } else {
-      toast.error('Username atau password salah. Silakan coba lagi.', {
+      // Tampilkan error yang dikirim oleh backend (misal: "Password salah!")
+      toast.error(result.message || 'Login gagal. Silakan coba lagi.', {
         icon: '🚫',
         style: { borderLeft: '4px solid #ef4444' },
       });
-      setErrors({ general: 'Kredensial tidak valid' });
+      setErrors({ general: result.message || 'Kredensial tidak valid' });
     }
+    
     setLoading(false);
   };
 
@@ -71,25 +74,9 @@ export default function LoginPage() {
             <p className="brand-tagline">Sistem Identifikasi Kemiripan Topik Tugas Akhir</p>
           </div>
 
-          <div className="brand-features">
-            {[
-              { icon: '🧠', title: 'SBERT Powered', desc: 'Semantic Sentence-BERT untuk pemahaman kontekstual judul TA' },
-              { icon: '📊', title: 'Cosine Similarity', desc: 'Deteksi kemiripan topik dengan akurasi tinggi' },
-              { icon: '🎓', title: 'Sistem Informasi Unand', desc: 'Dirancang untuk mahasiswa dan dosen FTI Unand' },
-            ].map((f, i) => (
-              <div className="feature-item" key={i} style={{ animationDelay: `${i * 0.1}s` }}>
-                <span className="feature-emoji">{f.icon}</span>
-                <div>
-                  <strong>{f.title}</strong>
-                  <p>{f.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
           <div className="brand-footer">
             <BookOpen size={14} />
-            <span>Universitas Andalas · Sistem Informasi · 2024</span>
+            <span>Universitas Andalas · Sistem Informasi · 2026</span>
           </div>
         </div>
 
@@ -145,7 +132,7 @@ export default function LoginPage() {
             </div>
 
             <div className="form-hint">
-              <span>Demo: <strong>tes123</strong> / <strong>tes123</strong></span>
+              <span>Pastikan username dan password sudah terdaftar di database</span>
             </div>
 
             <button type="submit" className="btn btn-primary login-btn" disabled={loading} id="login-submit-btn">

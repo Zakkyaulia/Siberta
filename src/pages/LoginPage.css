@@ -98,6 +98,8 @@
 .brand-logo {
   display: flex;
   align-items: center;
+  justify-content: center;
+  margin-top: auto;
 }
 .brand-icon-wrap {
   width: 56px; height: 56px;
@@ -107,6 +109,10 @@
   color: #fff;
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255,255,255,0.2);
+}
+
+.brand-text {
+  text-align: center;
 }
 
 .brand-text h1 {
@@ -158,6 +164,7 @@
   color: rgba(255,255,255,0.55);
   padding-top: 16px;
   border-top: 1px solid rgba(255,255,255,0.12);
+  margin-top: auto;
 }
 
 /* ---- Right Panel ---- */
