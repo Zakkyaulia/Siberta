@@ -368,6 +368,19 @@
   padding: 28px 32px;
 }
 
+.page-card {
+  background: #fff;
+  border: 1px solid var(--slate-100);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(2,6,23,0.04);
+}
+
+.page-card h2 { margin: 0 0 8px 0; }
+.page-card p { margin: 0; color: var(--slate-500); }
+.page-card input, .page-card textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--slate-100); border-radius: 8px; margin-top:6px; }
+.page-card button { padding: 8px 12px; border-radius: 8px; background: var(--sky-500); color: white; border: none; cursor: pointer; }
+
 /* ===== RESPONSIVE ===== */
 .sidebar-overlay {
   position: fixed; inset: 0;

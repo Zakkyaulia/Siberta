@@ -8,10 +8,26 @@ import {
 } from 'lucide-react';
 import './DashboardLayout.css';
 
-const MENU = [
-  { to: '/dashboard/profil',  icon: User,   label: 'Profil Mahasiswa', desc: 'Data diri & informasi akademik' },
-  { to: '/dashboard/cek-ta',  icon: Search, label: 'Cek Kemiripan TA',  desc: 'Deteksi kemiripan topik' },
-];
+const ROLE_MENUS = {
+  mahasiswa: [
+    { to: '/dashboard/mahasiswa', icon: User, label: 'Dashboard', desc: 'Ringkasan pengajuan & notifikasi' },
+    { to: '/dashboard/cek-ta', icon: Search, label: 'Cek Kemiripan', desc: 'Deteksi kemiripan topik (SBERT)' },
+    { to: '/dashboard/form-pengajuan', icon: GraduationCap, label: 'Form Pengajuan', desc: 'Ajukan judul ke dosen pembimbing' },
+    { to: '/dashboard/riwayat', icon: LogOut, label: 'Riwayat Status', desc: 'Lihat riwayat pengajuan' },
+  ],
+  dosen: [
+    { to: '/dashboard/dosen', icon: User, label: 'Dashboard Dosen', desc: 'Ringkasan tugas bimbingan' },
+    { to: '/dashboard/daftar-masuk', icon: Search, label: 'Daftar Masuk', desc: 'Pengajuan mahasiswa masuk' },
+    { to: '/dashboard/log-bimbingan', icon: LogOut, label: 'Log Bimbingan', desc: 'Catatan bimbingan mahasiswa' },
+  ],
+  departemen: [
+    { to: '/dashboard/admin', icon: User, label: 'Dashboard Admin', desc: 'Ringkasan administrasi' },
+    { to: '/dashboard/validasi', icon: Search, label: 'Validasi Akhir', desc: 'Validasi final pengajuan' },
+    { to: '/dashboard/master-data', icon: GraduationCap, label: 'Master Data TA', desc: 'Kelola basis data judul TA' },
+    { to: '/dashboard/manajemen-user', icon: User, label: 'Manajemen User', desc: 'Tambah / edit data user' },
+    { to: '/dashboard/sync-ml', icon: Cpu, label: 'Sinkronisasi ML', desc: 'Sinkronisasi SQL -> model (.pkl)' },
+  ],
+};
 
 export default function DashboardLayout() {
   const { user, logout } = useAuth();
@@ -74,23 +90,27 @@ export default function DashboardLayout() {
         {/* Navigation */}
         <nav className="sidebar-nav">
           <span className="nav-section-label">Menu Utama</span>
-          {MENU.map(({ to, icon: Icon, label, desc }) => (
-            <NavLink
-              key={to}
-              to={to}
-              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <div className="nav-item-icon">
-                <Icon size={19} strokeWidth={2} />
-              </div>
-              <div className="nav-item-text">
-                <span className="nav-label">{label}</span>
-                <span className="nav-desc">{desc}</span>
-              </div>
-              <ChevronRight size={15} className="nav-chevron" />
-            </NavLink>
-          ))}
+          {(() => {
+            const role = (user?.role || 'mahasiswa').toLowerCase();
+            const menu = ROLE_MENUS[role] || ROLE_MENUS.mahasiswa;
+            return menu.map(({ to, icon: Icon, label, desc }) => (
+              <NavLink
+                key={to}
+                to={to}
+                className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <div className="nav-item-icon">
+                  <Icon size={19} strokeWidth={2} />
+                </div>
+                <div className="nav-item-text">
+                  <span className="nav-label">{label}</span>
+                  <span className="nav-desc">{desc}</span>
+                </div>
+                <ChevronRight size={15} className="nav-chevron" />
+              </NavLink>
+            ));
+          })()}
         </nav>
 
         <div className="sidebar-divider" />

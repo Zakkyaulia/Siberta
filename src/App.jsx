@@ -6,6 +6,18 @@ import LoginPage from './pages/LoginPage';
 import DashboardLayout from './layouts/DashboardLayout';
 import ProfilPage from './pages/ProfilPage';
 import CekTAPage from './pages/CekTAPage';
+import MahasiswaDashboard from './pages/MahasiswaDashboard';
+import FormPengajuan from './pages/FormPengajuan';
+import RiwayatStatus from './pages/RiwayatStatus';
+import SBERTSim from './pages/SBERTSim';
+import DosenDashboard from './pages/DosenDashboard';
+import DaftarMasuk from './pages/DaftarMasuk';
+import LogBimbingan from './pages/LogBimbingan';
+import AdminDashboard from './pages/AdminDashboard';
+import ValidasiAkhir from './pages/ValidasiAkhir';
+import MasterDataTA from './pages/MasterDataTA';
+import ManajemenUser from './pages/ManajemenUser';
+import SyncML from './pages/SyncML';
 
 function ProtectedRoute({ children }) {
   const { isLoggedIn } = useAuth();
@@ -45,6 +57,22 @@ function App() {
             <Route index element={<Navigate to="profil" replace />} />
             <Route path="profil" element={<ProfilPage />} />
             <Route path="cek-ta" element={<CekTAPage />} />
+            <Route path="mahasiswa" element={<MahasiswaDashboard />} />
+            <Route path="form-pengajuan" element={<FormPengajuan />} />
+            <Route path="riwayat" element={<RiwayatStatus />} />
+            <Route path="sbert" element={<SBERTSim />} />
+
+            {/* Dosen routes */}
+            <Route path="dosen" element={<DosenDashboard />} />
+            <Route path="daftar-masuk" element={<DaftarMasuk />} />
+            <Route path="log-bimbingan" element={<LogBimbingan />} />
+
+            {/* Departemen / Admin routes */}
+            <Route path="admin" element={<AdminDashboard />} />
+            <Route path="validasi" element={<ValidasiAkhir />} />
+            <Route path="master-data" element={<MasterDataTA />} />
+            <Route path="manajemen-user" element={<ManajemenUser />} />
+            <Route path="sync-ml" element={<SyncML />} />
           </Route>
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
