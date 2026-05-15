@@ -24,7 +24,95 @@ const STATS = [
 
 export default function ProfilPage() {
   const { user } = useAuth();
+  const role = (user?.role || 'mahasiswa').toLowerCase();
+  const isMahasiswa = role === 'mahasiswa';
+  const isDosen = role === 'dosen';
+  const isAdmin = role === 'departemen' || role === 'admin';
 
+  // Konten untuk Dosen dan Admin
+  if (isDosen || isAdmin) {
+    const roleTitle = isDosen ? 'Dosen' : 'Administrator Departemen';
+    const roleSubtitle = isDosen 
+      ? 'Informasi data diri dan data pembimbing' 
+      : 'Informasi data diri dan akses administratif';
+    
+    return (
+      <div className="profil-page fade-in">
+        <div className="page-header">
+          <div>
+            <h1 className="page-title">Profil {roleTitle}</h1>
+            <p className="page-subtitle">{roleSubtitle}</p>
+          </div>
+        </div>
+
+        <div className="profil-hero card">
+          <div className="profil-hero-bg" />
+          <div className="profil-hero-content">
+            <div className="profil-avatar-wrap">
+              <div className="profil-avatar">{user?.avatar || user?.nama?.charAt(0).toUpperCase()}</div>
+              <div className="profil-avatar-badge">
+                <CheckCircle2 size={14} />
+              </div>
+            </div>
+            <div className="profil-hero-info">
+              <h2 className="profil-name">{user?.nama}</h2>
+              <div className="profil-meta">
+                <span className="badge badge-sky">
+                  <GraduationCap size={12} />
+                  {isDosen ? 'Dosen' : 'Admin'}
+                </span>
+                <span className="badge badge-green">
+                  <CheckCircle2 size={12} />
+                  Aktif
+                </span>
+              </div>
+              <p className="profil-nim">ID: {user?.username}</p>
+            </div>
+            <button className="btn btn-ghost profil-edit-btn">
+              <Edit2 size={15} />
+              Edit Profil
+            </button>
+          </div>
+        </div>
+
+        <div className="info-grid">
+          <div className="info-section card">
+            <div className="section-header">
+              <div className="section-icon">
+                <User size={17} />
+              </div>
+              <h3>Informasi {roleTitle}</h3>
+            </div>
+            <div className="info-fields">
+              <div className="info-field">
+                <div className="info-field-icon"><User size={15} /></div>
+                <div className="info-field-content">
+                  <span className="info-field-label">Nama Lengkap</span>
+                  <span className="info-field-value">{user?.nama}</span>
+                </div>
+              </div>
+              <div className="info-field">
+                <div className="info-field-icon"><Mail size={15} /></div>
+                <div className="info-field-content">
+                  <span className="info-field-label">Email</span>
+                  <span className="info-field-value">{user?.email || '-'}</span>
+                </div>
+              </div>
+              <div className="info-field">
+                <div className="info-field-icon"><CheckCircle2 size={15} /></div>
+                <div className="info-field-content">
+                  <span className="info-field-label">Role</span>
+                  <span className="info-field-value">{isDosen ? 'Dosen Pembimbing' : 'Administrator'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Konten untuk Mahasiswa (original)
   return (
     <div className="profil-page fade-in">
       {/* Page Header */}
