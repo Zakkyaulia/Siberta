@@ -1,5 +1,5 @@
-import { createContext, useState, useContext } from 'react';
-import axios from 'axios';
+import { createContext, useState, useContext, useEffect } from 'react';
+import api, { setAuthToken } from '../services/api';
 
 // 1. Inisialisasi Context
 export const AuthContext = createContext();
@@ -13,16 +13,16 @@ export const AuthProvider = ({ children }) => {
     });
     const [token, setToken] = useState(localStorage.getItem('token') || null);
 
+    useEffect(() => {
+        if (token) setAuthToken(token);
+    }, [token]);
+
     const isLoggedIn = !!token;
     
     // Fungsi untuk login
     const login = async (username, password) => {
         try {
-            const response = await axios.post('http://localhost:5000/api/auth/login', {
-                username,
-                password
-            });
-            
+            const response = await api.post('/api/auth/login', { username, password });
             const { token: newToken, user: userData } = response.data;
             
             // Simpan token DAN data user ke Local Storage
@@ -31,14 +31,13 @@ export const AuthProvider = ({ children }) => {
             
             setToken(newToken);
             setUser(userData);
+            setAuthToken(newToken);
             
             return { success: true };
         } catch (error) {
-            console.error("Login gagal", error);
-            return { 
-                success: false, 
-                message: error.response?.data?.pesan || "Terjadi kesalahan server" 
-            };
+            console.error('Login gagal', error);
+            const message = error.message === 'Network Error' ? 'Tidak dapat terhubung ke server backend.' : (error.response?.data?.pesan || 'Terjadi kesalahan server');
+            return { success: false, message };
         }
     };
 
@@ -50,6 +49,7 @@ export const AuthProvider = ({ children }) => {
         
         setToken(null);
         setUser(null);
+        setAuthToken(null);
     };
 
     return (

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import {
   Search, FileText, Zap, AlertCircle, ChevronDown,
@@ -128,14 +128,11 @@ export default function CekTAPage() {
 
     try {
       // Panggil API Backend menggunakan token
-      const response = await axios.post(
-        'http://localhost:5000/api/ta/cek',
-        { judul_baru: judulTA },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.post('/api/ta/cek', { judul_baru: judulTA });
+      const response = res;
 
       const backendData = response.data;
-      const skor = backendData.skor_kemiripan_tertinggi;
+      const skor = backendData.skor_kemiripan_tertinggi || backendData.max_score || backendData.similarity_score || 0;
 
       // Logika Penentuan Label & Warna
       let color, label, description;

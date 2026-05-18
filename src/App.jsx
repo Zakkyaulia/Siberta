@@ -28,8 +28,10 @@ function ProtectedRoute({ children, allowedRoles }) {
   if (!isLoggedIn) return <Navigate to="/login" replace />;
 
   // Jika rute butuh role spesifik dan user tidak memilikinya, arahkan ke /dashboard
-  if (allowedRoles && !allowedRoles.includes(user?.role)) {
-    return <Navigate to="/dashboard" replace />;
+  if (allowedRoles) {
+    const userRole = (user?.role || '').toString().toLowerCase();
+    const allowed = allowedRoles.map(r => r.toString().toLowerCase());
+    if (!allowed.includes(userRole)) return <Navigate to="/dashboard" replace />;
   }
 
   return children;

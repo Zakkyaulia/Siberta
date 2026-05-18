@@ -36,7 +36,8 @@ export default function DashboardLayout() {
     ]
   };
 
-  const activeMenu = menuConfig[user?.role] || [];
+  const roleKey = (user?.role || '').toString().toLowerCase();
+  const activeMenu = menuConfig[roleKey] || [];
 
   const handleLogout = () => {
     toast.success('Berhasil logout. Sampai jumpa! 👋');
@@ -116,6 +117,12 @@ export default function DashboardLayout() {
             <div className="topbar-avatar" style={{ backgroundColor: '#0ea5e9', color: 'white' }}>{inisial}</div>
           </div>
         </header>
+
+        {import.meta.env.DEV && (
+          <div style={{padding:12, background:'#fff7ed', borderTop:'1px solid #fde68a'}}>
+            <strong>DEBUG:</strong> user = {JSON.stringify(user)}
+          </div>
+        )}
 
         <main className="page-content">
           <Outlet />
