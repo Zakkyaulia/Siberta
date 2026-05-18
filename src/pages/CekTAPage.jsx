@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import api from '../services/api';
+import api, { setAuthToken } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import {
   Search, FileText, Zap, AlertCircle, ChevronDown,
@@ -128,11 +128,13 @@ export default function CekTAPage() {
 
     try {
       // Panggil API Backend menggunakan token
+      setAuthToken(token);
       const res = await api.post('/api/ta/cek', { judul_baru: judulTA });
       const response = res;
 
-      const backendData = response.data;
+      const backendData = response.data || {};
       const skor = backendData.skor_kemiripan_tertinggi || backendData.max_score || backendData.similarity_score || 0;
+      const rekomendasi = Array.isArray(backendData.rekomendasi_mirip) ? backendData.rekomendasi_mirip : [];
 
       // Logika Penentuan Label & Warna
       let color, label, description;
@@ -151,7 +153,7 @@ export default function CekTAPage() {
       }
 
       // Format data array rekomendasi dari backend agar sesuai dengan UI MatchCard
-      const formattedMatches = backendData.rekomendasi_mirip.map((item, index) => ({
+      const formattedMatches = rekomendasi.map((item, index) => ({
         rank: index + 1,
         nim: 'Data Menyusul', // Backend belum mengirim ini
         nama: item.penulis,
@@ -176,7 +178,7 @@ export default function CekTAPage() {
 
     } catch (error) {
       console.error(error);
-      const errorMsg = error.response?.data?.pesan || "Gagal menghubungi server backend.";
+      const errorMsg = error.response?.data?.pesan || error.response?.data?.message || "ML Service tidak tersedia. Pastikan Python service sudah berjalan.";
       toast.error(errorMsg);
       setHasSearched(false);
     } finally {

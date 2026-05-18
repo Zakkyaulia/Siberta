@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import api, { setAuthToken } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -57,19 +57,24 @@ export default function DaftarMasuk() {
   const [items, setItems] = useState([]);
   const [selected, setSelected] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const hasLoadedRef = useRef(false);
 
-  const load = async () => {
+  const load = async (showErrorToast = true) => {
     try {
       setAuthToken(token);
       const res = await api.get('/api/pengajuan');
-      setItems(res.data.data || []);
+      setItems(res.data?.data || []);
     } catch (err) {
       console.error(err);
-      toast.error('Gagal memuat daftar masuk');
+      if (showErrorToast) toast.error('Gagal memuat daftar masuk');
     }
   };
 
-  useEffect(() => { load(); }, [token]);
+  useEffect(() => {
+    if (!token || hasLoadedRef.current) return;
+    hasLoadedRef.current = true;
+    load();
+  }, [token]);
 
   const openReview = (it) => { setSelected(it); setModalOpen(true); };
 

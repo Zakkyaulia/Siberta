@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginPage from './pages/LoginPage';
@@ -34,7 +34,7 @@ function ProtectedRoute({ children, allowedRoles }) {
     if (!allowed.includes(userRole)) return <Navigate to="/dashboard" replace />;
   }
 
-  return children;
+  return children ?? <Outlet />;
 }
 
 // 2. Pelindung Rute Publik (Mencegah user yang sudah login balik ke login)

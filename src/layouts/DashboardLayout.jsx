@@ -29,7 +29,7 @@ export default function DashboardLayout() {
     ],
     admin: [
       { to: '/dashboard/profil', icon: User, label: 'Dashboard Admin', desc: 'Ringkasan sistem' },
-      { to: '/dashboard/validasi-akhir', icon: ShieldCheck, label: 'Validasi Akhir', desc: 'Persetujuan Prodi' },
+      { to: '/dashboard/validasi', icon: ShieldCheck, label: 'Validasi Akhir', desc: 'Persetujuan Prodi' },
       { to: '/dashboard/master-data', icon: Database, label: 'Master Data TA', desc: 'Basis data resmi' },
       { to: '/dashboard/manajemen-user', icon: Users, label: 'Manajemen User', desc: 'Kelola akun' },
       { to: '/dashboard/sync-ml', icon: RefreshCw, label: 'Sync Model ML', desc: 'Latih ulang AI' },
@@ -117,12 +117,6 @@ export default function DashboardLayout() {
             <div className="topbar-avatar" style={{ backgroundColor: '#0ea5e9', color: 'white' }}>{inisial}</div>
           </div>
         </header>
-
-        {import.meta.env.DEV && (
-          <div style={{padding:12, background:'#fff7ed', borderTop:'1px solid #fde68a'}}>
-            <strong>DEBUG:</strong> user = {JSON.stringify(user)}
-          </div>
-        )}
 
         <main className="page-content">
           <Outlet />
