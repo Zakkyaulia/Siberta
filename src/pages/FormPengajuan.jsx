@@ -72,7 +72,7 @@ export default function FormPengajuan() {
     const loadDosen = async () => {
       setAuthToken(token);
 
-      const endpoints = ['/api/dosen', '/api/users/dosen', '/api/admin/users'];
+      const endpoints = ['/api/auth/dosen', '/api/dosen', '/api/users/dosen', '/api/admin/users'];
       for (const endpoint of endpoints) {
         try {
           const res = await api.get(endpoint);
