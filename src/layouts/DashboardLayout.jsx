@@ -3,9 +3,22 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import {
-  User, Search, LogOut, Cpu, ChevronRight,
-  Menu, X, Bell, GraduationCap, FilePlus, 
-  Clock, Inbox, BookOpen, ShieldCheck, Database, Users, RefreshCw
+   User,
+  Search,
+  LogOut,
+  Cpu,
+  ChevronRight,
+  Menu,
+  X,
+  LayoutDashboard,
+  FilePlus,
+  Clock,
+  Inbox,
+  BookOpen,
+  ShieldCheck,
+  Database,
+  Users,
+  RefreshCw,
 } from 'lucide-react';
 import './DashboardLayout.css';
 
@@ -30,26 +43,145 @@ export default function DashboardLayout() {
   }, []);
 
   // KONFIGURASI MENU BERDASARKAN ROLE
-  const menuConfig = {
-    mahasiswa: [
-      { to: '/dashboard/profil', icon: User, label: 'Profil Saya', desc: 'Data akademik' },
-      { to: '/dashboard/cek-ta', icon: Search, label: 'Cek Kemiripan', desc: 'Analisis AI SBERT' },
-      { to: '/dashboard/form-pengajuan', icon: FilePlus, label: 'Ajukan Judul', desc: 'Formulir TA' },
-      { to: '/dashboard/riwayat', icon: Clock, label: 'Riwayat Status', desc: 'Pantau persetujuan' },
-    ],
-    dosen: [
-      { to: '/dashboard/profil', icon: User, label: 'Profil Dosen', desc: 'Informasi pengajar' },
-      { to: '/dashboard/daftar-masuk', icon: Inbox, label: 'Daftar Masuk', desc: 'Review judul MHS' },
-      { to: '/dashboard/log-bimbingan', icon: BookOpen, label: 'Log Bimbingan', desc: 'Catatan konsultasi' },
-    ],
-    admin: [
-      { to: '/dashboard/profil', icon: User, label: 'Dashboard Admin', desc: 'Ringkasan sistem' },
-      { to: '/dashboard/validasi', icon: ShieldCheck, label: 'Validasi Akhir', desc: 'Persetujuan Prodi' },
-      { to: '/dashboard/master-data', icon: Database, label: 'Master Data TA', desc: 'Basis data resmi' },
-      { to: '/dashboard/manajemen-user', icon: Users, label: 'Manajemen User', desc: 'Kelola akun' },
-      { to: '/dashboard/sync-ml', icon: RefreshCw, label: 'Sync Model ML', desc: 'Latih ulang AI' },
-    ]
-  };
+const menuConfig = {
+  mahasiswa: [
+    {
+      to: '/dashboard/mahasiswa',
+      icon: LayoutDashboard,
+      label: 'Dashboard',
+      desc: 'Ringkasan aktivitas',
+    },
+    {
+      to: '/dashboard/profil',
+      icon: User,
+      label: 'Profil Saya',
+      desc: 'Data akademik',
+    },
+    {
+      to: '/dashboard/cek-ta',
+      icon: Search,
+      label: 'Cek Kemiripan',
+      desc: 'Analisis AI SBERT',
+    },
+    {
+      to: '/dashboard/form-pengajuan',
+      icon: FilePlus,
+      label: 'Ajukan Judul',
+      desc: 'Formulir TA',
+    },
+    {
+      to: '/dashboard/riwayat',
+      icon: Clock,
+      label: 'Riwayat Status',
+      desc: 'Pantau persetujuan',
+    },
+  ],
+
+  dosen: [
+    {
+      to: '/dashboard/dosen',
+      icon: LayoutDashboard,
+      label: 'Dashboard',
+      desc: 'Ringkasan dosen',
+    },
+    {
+      to: '/dashboard/profil',
+      icon: User,
+      label: 'Profil Dosen',
+      desc: 'Informasi pengajar',
+    },
+    {
+      to: '/dashboard/daftar-masuk',
+      icon: Inbox,
+      label: 'Daftar Masuk',
+      desc: 'Review judul MHS',
+    },
+    {
+      to: '/dashboard/log-bimbingan',
+      icon: BookOpen,
+      label: 'Log Bimbingan',
+      desc: 'Catatan konsultasi',
+    },
+  ],
+
+  admin: [
+    {
+      to: '/dashboard/admin',
+      icon: LayoutDashboard,
+      label: 'Dashboard',
+      desc: 'Ringkasan sistem',
+    },
+    {
+      to: '/dashboard/profil',
+      icon: User,
+      label: 'Profil Admin',
+      desc: 'Informasi admin',
+    },
+    {
+      to: '/dashboard/validasi',
+      icon: ShieldCheck,
+      label: 'Validasi Akhir',
+      desc: 'Persetujuan Prodi',
+    },
+    {
+      to: '/dashboard/master-data',
+      icon: Database,
+      label: 'Master Data TA',
+      desc: 'Basis data resmi',
+    },
+    {
+      to: '/dashboard/manajemen-user',
+      icon: Users,
+      label: 'Manajemen User',
+      desc: 'Kelola akun',
+    },
+    {
+      to: '/dashboard/sync-ml',
+      icon: RefreshCw,
+      label: 'Sync Model ML',
+      desc: 'Latih ulang AI',
+    },
+  ],
+
+  departemen: [
+    {
+      to: '/dashboard/admin',
+      icon: LayoutDashboard,
+      label: 'Dashboard',
+      desc: 'Ringkasan sistem',
+    },
+    {
+      to: '/dashboard/profil',
+      icon: User,
+      label: 'Profil Admin',
+      desc: 'Informasi admin',
+    },
+    {
+      to: '/dashboard/validasi',
+      icon: ShieldCheck,
+      label: 'Validasi Akhir',
+      desc: 'Persetujuan Prodi',
+    },
+    {
+      to: '/dashboard/master-data',
+      icon: Database,
+      label: 'Master Data TA',
+      desc: 'Basis data resmi',
+    },
+    {
+      to: '/dashboard/manajemen-user',
+      icon: Users,
+      label: 'Manajemen User',
+      desc: 'Kelola akun',
+    },
+    {
+      to: '/dashboard/sync-ml',
+      icon: RefreshCw,
+      label: 'Sync Model ML',
+      desc: 'Latih ulang AI',
+    },
+  ],
+};
 
   const roleKey = (user?.role || '').toString().toLowerCase();
   const activeMenu = menuConfig[roleKey] || [];

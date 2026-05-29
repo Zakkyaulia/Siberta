@@ -1,63 +1,92 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  Outlet,
+} from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
+
 import LoginPage from './pages/LoginPage';
 import DashboardLayout from './layouts/DashboardLayout';
 
-// Halaman-Halaman
+// Halaman Umum
 import ProfilPage from './pages/ProfilPage';
-import CekTAPage from './pages/CekTAPage';
+
+// Halaman Mahasiswa
 import MahasiswaDashboard from './pages/MahasiswaDashboard';
+import CekTAPage from './pages/CekTAPage';
 import FormPengajuan from './pages/FormPengajuan';
 import RiwayatStatus from './pages/RiwayatStatus';
 import SBERTSim from './pages/SBERTSim';
+
+// Halaman Dosen
 import DosenDashboard from './pages/DosenDashboard';
 import DaftarMasuk from './pages/DaftarMasuk';
 import LogBimbingan from './pages/LogBimbingan';
+
+// Halaman Admin
 import AdminDashboard from './pages/AdminDashboard';
 import ValidasiAkhir from './pages/ValidasiAkhir';
 import MasterDataTA from './pages/MasterDataTA';
 import ManajemenUser from './pages/ManajemenUser';
 import SyncML from './pages/SyncML';
 
-// 1. Pelindung Rute Umum (Cek Login)
+function getDashboardPathByRole(role) {
+  const normalizedRole = (role || 'mahasiswa').toString().toLowerCase();
+
+  if (normalizedRole === 'dosen') {
+    return '/dashboard/dosen';
+  }
+
+  if (normalizedRole === 'departemen' || normalizedRole === 'admin') {
+    return '/dashboard/admin';
+  }
+
+  return '/dashboard/mahasiswa';
+}
+
+// Pelindung rute umum
 function ProtectedRoute({ children, allowedRoles }) {
   const { isLoggedIn, user } = useAuth();
 
-  if (!isLoggedIn) return <Navigate to="/login" replace />;
-
-  // Jika rute butuh role spesifik dan user tidak memilikinya, arahkan ke /dashboard
-  if (allowedRoles) {
-    const userRole = (user?.role || '').toString().toLowerCase();
-    const allowed = allowedRoles.map(r => r.toString().toLowerCase());
-    if (!allowed.includes(userRole)) return <Navigate to="/dashboard" replace />;
+  if (!isLoggedIn) {
+    return <Navigate to="/login" replace />;
   }
 
-  return children ?? <Outlet />;
+  if (allowedRoles) {
+    const userRole = (user?.role || '').toString().toLowerCase();
+
+    const allowed = allowedRoles.map((role) =>
+      role.toString().toLowerCase()
+    );
+
+    if (!allowed.includes(userRole)) {
+      return <Navigate to={getDashboardPathByRole(userRole)} replace />;
+    }
+  }
+
+  return children || <Outlet />;
 }
 
-// 2. Pelindung Rute Publik (Mencegah user yang sudah login balik ke login)
+// Mencegah user yang sudah login balik ke halaman login
 function PublicRoute({ children }) {
   const { isLoggedIn, user } = useAuth();
-  if (!isLoggedIn) return children;
-  
-  // Jika sudah login, redirect ke dashboard sesuai role
-  const role = (user?.role || 'mahasiswa').toLowerCase();
-  if (role === 'dosen') return <Navigate to="/dashboard/dosen" replace />;
-  if (role === 'departemen' || role === 'admin') return <Navigate to="/dashboard/admin" replace />;
-  return <Navigate to="/dashboard/mahasiswa" replace />;
+
+  if (!isLoggedIn) {
+    return children;
+  }
+
+  return <Navigate to={getDashboardPathByRole(user?.role)} replace />;
 }
 
-// Redirect ke halaman dashboard yang sesuai berdasarkan role
+// Redirect default /dashboard berdasarkan role
 function DashboardIndex() {
   const { user } = useAuth();
-  const role = (user?.role || 'mahasiswa').toLowerCase();
 
-  if (role === 'dosen') return <Navigate to="daftar-masuk" replace />;
-  if (role === 'departemen' || role === 'admin') return <Navigate to="admin" replace />;
-  // Default mahasiswa
-  return <Navigate to="mahasiswa" replace />;
+  return <Navigate to={getDashboardPathByRole(user?.role)} replace />;
 }
 
 function App() {
@@ -65,40 +94,62 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Toaster position="top-right" />
+
         <Routes>
-          <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-          
+          <Route
+            path="/login"
+            element={
+              <PublicRoute>
+                <LoginPage />
+              </PublicRoute>
+            }
+          />
+
           <Route
             path="/dashboard"
-            element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
           >
-            <Route
-              index
-              element={<DashboardIndex />}
-            />
+            <Route index element={<DashboardIndex />} />
+
+            {/* Profil bisa diakses semua role */}
             <Route path="profil" element={<ProfilPage />} />
 
-            {/* Landing redirect depending on role */}
-            
-
-            {/* --- RUTE KHUSUS MAHASISWA --- */}
-            <Route path="mahasiswa" element={<MahasiswaDashboard />} />
+            {/* SBERT Simulasi, bisa diakses umum kalau memang dibutuhkan */}
             <Route path="sbert" element={<SBERTSim />} />
-            <Route element={<ProtectedRoute allowedRoles={['mahasiswa']} />}>
+
+            {/* Rute Khusus Mahasiswa */}
+            <Route
+              element={
+                <ProtectedRoute allowedRoles={['mahasiswa']} />
+              }
+            >
+              <Route path="mahasiswa" element={<MahasiswaDashboard />} />
               <Route path="cek-ta" element={<CekTAPage />} />
               <Route path="form-pengajuan" element={<FormPengajuan />} />
               <Route path="riwayat" element={<RiwayatStatus />} />
             </Route>
 
-            {/* --- RUTE KHUSUS DOSEN --- */}
-            <Route element={<ProtectedRoute allowedRoles={['dosen']} />}>
+            {/* Rute Khusus Dosen */}
+            <Route
+              element={
+                <ProtectedRoute allowedRoles={['dosen']} />
+              }
+            >
               <Route path="dosen" element={<DosenDashboard />} />
               <Route path="daftar-masuk" element={<DaftarMasuk />} />
               <Route path="log-bimbingan" element={<LogBimbingan />} />
             </Route>
 
-            {/* --- RUTE KHUSUS ADMIN/DEPARTEMEN --- */}
-            <Route element={<ProtectedRoute allowedRoles={['departemen','admin']} />}>
+            {/* Rute Khusus Admin / Departemen */}
+            <Route
+              element={
+                <ProtectedRoute allowedRoles={['departemen', 'admin']} />
+              }
+            >
               <Route path="admin" element={<AdminDashboard />} />
               <Route path="validasi" element={<ValidasiAkhir />} />
               <Route path="master-data" element={<MasterDataTA />} />
@@ -107,6 +158,7 @@ function App() {
             </Route>
           </Route>
 
+          <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>

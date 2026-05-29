@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import api, { setAuthToken } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import {
-  Search, FileText, Zap, AlertCircle, ChevronDown,
-  BookOpen, Calendar, User, TrendingUp, BarChart2, CheckCircle2, Info
+  Search, FileText, Zap, AlertCircle,
+  BookOpen, User, TrendingUp, BarChart2, CheckCircle2, Info
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import './CekTAPage.css';
@@ -45,7 +45,6 @@ function SimilarityGauge({ score, color }) {
 }
 
 function MatchCard({ match, delay }) {
-  const [expanded, setExpanded] = useState(false);
   const getScoreColor = (s) => s >= 70 ? 'danger' : s >= 40 ? 'warning' : 'success';
   const color = getScoreColor(match.similarity);
 
@@ -54,7 +53,7 @@ function MatchCard({ match, delay }) {
       className={`match-card card fade-in`}
       style={{ animationDelay: `${delay}s` }}
     >
-      <div className="match-card-header" onClick={() => setExpanded(v => !v)}>
+      <div className="match-card-header">
         <div className="match-rank">
           <span>#{match.rank}</span>
         </div>
@@ -62,8 +61,6 @@ function MatchCard({ match, delay }) {
           <p className="match-title">{match.judul}</p>
           <div className="match-meta">
             <span><User size={12} /> {match.nama}</span>
-            <span><Hash size={12} /> {match.nim}</span>
-            <span><Calendar size={12} /> {match.tahun}</span>
           </div>
         </div>
         <div className="match-score-wrap">
@@ -77,30 +74,8 @@ function MatchCard({ match, delay }) {
             />
           </div>
         </div>
-        <ChevronDown size={16} className={`match-chevron ${expanded ? 'open' : ''}`} />
       </div>
-
-      {expanded && (
-        <div className="match-card-body fade-in">
-          <div className="match-keywords">
-            <span className="kw-label">Kata Kunci:</span>
-            {match.keywords.map((kw, i) => (
-              <span key={i} className="badge badge-sky kw-badge">{kw}</span>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
-  );
-}
-
-// Helper component to avoid JSX issue with Hash from lucide
-function Hash({ size }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/>
-      <line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>
-    </svg>
   );
 }
 
@@ -155,13 +130,9 @@ export default function CekTAPage() {
       // Format data array rekomendasi dari backend agar sesuai dengan UI MatchCard
       const formattedMatches = rekomendasi.map((item, index) => ({
         rank: index + 1,
-        nim: 'Data Menyusul', // Backend belum mengirim ini
         nama: item.penulis,
         judul: item.judul,
-        tahun: item.tahun,
-        prodi: 'Sistem Informasi',
-        similarity: item.skor,
-        keywords: ['Sistem', 'Informasi'] // Dummy keywords sementara
+        similarity: item.skor
       }));
 
       // Simpan ke state
@@ -207,8 +178,8 @@ export default function CekTAPage() {
           <p className="page-subtitle">Analisis kemiripan topik TA menggunakan SBERT + Cosine Similarity</p>
         </div>
         <div className="header-badges">
-          <span className="badge badge-sky"><Zap size={12} /> SBERT</span>
-          <span className="badge badge-sky"><BarChart2 size={12} /> Cosine Similarity</span>
+          {/* <span className="badge badge-sky"><Zap size={12} /> SBERT</span>
+          <span className="badge badge-sky"><BarChart2 size={12} /> Cosine Similarity</span> */}
         </div>
       </div>
 
@@ -381,7 +352,7 @@ export default function CekTAPage() {
 
           {/* Action Buttons */}
           <div className="result-actions">
-            <button className="btn btn-ghost" onClick={handleReset} id="cek-ulang-btn">
+            <button className="btn btn-primary" onClick={handleReset} id="cek-ulang-btn">
               🔄 Cek Judul Lain
             </button>
           </div>

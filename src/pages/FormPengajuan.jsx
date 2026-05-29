@@ -132,7 +132,7 @@ export default function FormPengajuan() {
         },
         {
           id: '3',
-          nama: 'Dr. Dosen Penguji',
+          nama: 'Dr. Dosen Pembimbing',
           username: 'dosen2',
           role: 'dosen',
         },

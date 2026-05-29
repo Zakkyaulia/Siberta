@@ -86,7 +86,7 @@ function ReviewModal({ open, onClose, submission, onSubmitted }) {
         <div className="review-info">
           <div>
             <span>Mahasiswa</span>
-            <strong>{submission.student_id || '-'}</strong>
+            <strong>{submission.mahasiswa?.nama || submission.student_id || '-'}</strong>
           </div>
 
           <div>
@@ -256,7 +256,7 @@ export default function DaftarMasuk() {
                       <h3>{item.judul || '-'}</h3>
 
                       <div className="daftar-meta">
-                        <span>Mahasiswa: {item.student_id || '-'}</span>
+                        <span>Mahasiswa: {item.mahasiswa?.nama || item.student_id || '-'}</span>
                         <span>Tanggal: {formatTanggal(item.created_at)}</span>
                       </div>
                     </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   FileText,
   Bell,
@@ -14,6 +15,8 @@ import {
 import './MahasiswaDashboard.css';
 
 export default function MahasiswaDashboard() {
+  const navigate = useNavigate();
+
   const stats = [
     {
       title: 'Status Pengajuan',
@@ -157,12 +160,19 @@ export default function MahasiswaDashboard() {
           </div>
 
           <div className="quick-actions">
-            <button type="button">
+            <button
+              type="button"
+              onClick={() => navigate('/dashboard/form-pengajuan')}
+            >
               <Send size={16} />
               Ajukan Judul
             </button>
 
-            <button type="button" className="secondary">
+            <button
+              type="button"
+              className="secondary"
+              onClick={() => navigate('/dashboard/riwayat')}
+            >
               <History size={16} />
               Lihat Riwayat
             </button>
@@ -237,7 +247,10 @@ export default function MahasiswaDashboard() {
             lebih mudah diverifikasi.
           </p>
 
-          <button type="button">
+          <button
+            type="button"
+            onClick={() => navigate('/dashboard/profil')}
+          >
             <CheckCircle2 size={16} />
             Cek Profil
           </button>
