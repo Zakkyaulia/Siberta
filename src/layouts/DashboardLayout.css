@@ -389,6 +389,14 @@
   backdrop-filter: blur(2px);
 }
 
+/* Ensure overlay doesn't block desktop interaction if rendered unexpectedly */
+@media (min-width: 900px) {
+  .sidebar-overlay {
+    display: none;
+    pointer-events: none;
+  }
+}
+
 @media (max-width: 900px) {
   .sidebar {
     transform: translateX(-100%);

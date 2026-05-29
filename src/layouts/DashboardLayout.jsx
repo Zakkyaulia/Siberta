@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -13,6 +13,21 @@ export default function DashboardLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 900);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // allow closing sidebar with Escape key for accessibility
+  useEffect(() => {
+    const onKeyDown = (e) => { if (e.key === 'Escape') setSidebarOpen(false); };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   // KONFIGURASI MENU BERDASARKAN ROLE
   const menuConfig = {
@@ -49,7 +64,7 @@ export default function DashboardLayout() {
 
   return (
     <div className="dashboard-root">
-      {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
+      {sidebarOpen && isMobile && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
 
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
@@ -113,7 +128,7 @@ export default function DashboardLayout() {
             </div>
           </div>
           <div className="topbar-actions">
-            <button className="topbar-icon-btn"><Bell size={18} /><span className="notif-dot" /></button>
+            {/* <button className="topbar-icon-btn"><Bell size={18} /><span className="notif-dot" /></button> */}
             <div className="topbar-avatar" style={{ backgroundColor: '#0ea5e9', color: 'white' }}>{inisial}</div>
           </div>
         </header>

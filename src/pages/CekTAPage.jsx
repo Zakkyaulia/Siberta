@@ -384,9 +384,6 @@ export default function CekTAPage() {
             <button className="btn btn-ghost" onClick={handleReset} id="cek-ulang-btn">
               🔄 Cek Judul Lain
             </button>
-            <button className="btn btn-primary" id="export-result-btn">
-              📄 Ekspor Hasil (PDF)
-            </button>
           </div>
         </div>
       )}

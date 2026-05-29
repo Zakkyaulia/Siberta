@@ -1,0 +1,188 @@
+.pengajuan-page {
+  min-height: 100vh;
+  padding: 32px;
+  background: #f4f7fb;
+}
+
+.pengajuan-card {
+  width: 100%;
+  max-width: none;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 32px;
+  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e5eaf0;
+}
+
+.pengajuan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.pengajuan-header h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f2544;
+}
+
+.pengajuan-header p {
+  margin: 8px 0 0;
+  font-size: 15px;
+  color: #64748b;
+}
+
+.pengajuan-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.form-group label span {
+  color: #ef4444;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d8e0ea;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #0f172a;
+  background: #ffffff;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #94a3b8;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.form-group select {
+  cursor: pointer;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
+}
+
+.form-group small {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.file-box {
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 14px;
+  background: #f8fafc;
+  transition: 0.2s ease;
+}
+
+.file-box:hover {
+  border-color: #0ea5e9;
+  background: #f0f9ff;
+}
+
+.file-box input {
+  border: none;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.file-box input:focus {
+  box-shadow: none;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.form-action {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 8px;
+}
+
+.form-action button {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 24px;
+  background: #0ea5e9;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.form-action button:hover {
+  background: #0284c7;
+  transform: translateY(-1px);
+}
+
+.form-action button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 768px) {
+  .pengajuan-page {
+    padding: 18px;
+  }
+
+  .pengajuan-card {
+    padding: 22px;
+    border-radius: 14px;
+  }
+
+  .pengajuan-header h2 {
+    font-size: 24px;
+  }
+
+  .pengajuan-header p {
+    font-size: 14px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-action button {
+    width: 100%;
+  }
+}

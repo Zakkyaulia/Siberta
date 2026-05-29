@@ -1,0 +1,248 @@
+.master-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 32px;
+  background: #f4f7fb;
+  box-sizing: border-box;
+}
+
+.master-card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 32px;
+  border: 1px solid #e5eaf0;
+  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
+  box-sizing: border-box;
+}
+
+.master-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.master-header h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f2544;
+}
+
+.master-header p {
+  margin: 8px 0 0;
+  font-size: 15px;
+  color: #64748b;
+}
+
+.master-count {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.master-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  padding: 20px;
+  margin-bottom: 24px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid #e5eaf0;
+}
+
+.master-input-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.master-input-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.master-input-group input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d8e0ea;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #0f172a;
+  background: #ffffff;
+  outline: none;
+  transition: 0.2s ease;
+  font-family: inherit;
+}
+
+.master-input-group input::placeholder {
+  color: #94a3b8;
+}
+
+.master-input-group input:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
+}
+
+.master-form button {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  background: #0ea5e9;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: 0.2s ease;
+  white-space: nowrap;
+}
+
+.master-form button:hover {
+  background: #0284c7;
+  transform: translateY(-1px);
+}
+
+.master-form button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.master-content {
+  margin-top: 8px;
+}
+
+.master-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.master-item {
+  display: flex;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid #e5eaf0;
+  border-radius: 14px;
+  background: #ffffff;
+  transition: 0.2s ease;
+}
+
+.master-item:hover {
+  border-color: #bae6fd;
+  background: #f8fbff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+  transform: translateY(-1px);
+}
+
+.master-number {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 10px;
+  background: #f0f9ff;
+  color: #0284c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.master-title h3 {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.5;
+  color: #0f172a;
+}
+
+.master-title p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.loading-state {
+  padding: 28px;
+  border-radius: 14px;
+  background: #f8fafc;
+  color: #64748b;
+  text-align: center;
+  font-size: 15px;
+}
+
+.empty-state {
+  padding: 48px 24px;
+  border-radius: 16px;
+  border: 1px dashed #cbd5e1;
+  background: #f8fafc;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 38px;
+  margin-bottom: 12px;
+}
+
+.empty-state h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #0f172a;
+}
+
+.empty-state p {
+  margin: 8px auto 0;
+  max-width: 480px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #64748b;
+}
+
+@media (max-width: 768px) {
+  .master-page {
+    padding: 18px;
+  }
+
+  .master-card {
+    padding: 22px;
+    border-radius: 14px;
+  }
+
+  .master-header {
+    flex-direction: column;
+  }
+
+  .master-header h2 {
+    font-size: 24px;
+  }
+
+  .master-form {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+  }
+
+  .master-form button {
+    width: 100%;
+  }
+
+  .master-item {
+    padding: 16px;
+  }
+
+  .master-title h3 {
+    font-size: 16px;
+  }
+}

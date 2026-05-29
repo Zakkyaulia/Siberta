@@ -1,0 +1,313 @@
+.user-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 32px;
+  background: #f4f7fb;
+  box-sizing: border-box;
+}
+
+.user-card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 32px;
+  border: 1px solid #e5eaf0;
+  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
+  box-sizing: border-box;
+}
+
+.user-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.user-header h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f2544;
+}
+
+.user-header p {
+  margin: 8px 0 0;
+  font-size: 15px;
+  color: #64748b;
+}
+
+.user-count {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.user-layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.user-form-card,
+.user-list-card {
+  border: 1px solid #e5eaf0;
+  border-radius: 16px;
+  background: #f8fafc;
+  padding: 22px;
+  box-sizing: border-box;
+}
+
+.form-title,
+.list-title {
+  margin-bottom: 18px;
+}
+
+.form-title h3,
+.list-title h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #0f2544;
+}
+
+.form-title p,
+.list-title p {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.user-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.user-form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.user-form-group input,
+.user-form-group select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d8e0ea;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #0f172a;
+  background: #ffffff;
+  outline: none;
+  transition: 0.2s ease;
+  font-family: inherit;
+}
+
+.user-form-group input::placeholder {
+  color: #94a3b8;
+}
+
+.user-form-group input:focus,
+.user-form-group select:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
+}
+
+.user-form-card button {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 18px;
+  margin-top: 4px;
+  background: #0ea5e9;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.user-form-card button:hover {
+  background: #0284c7;
+  transform: translateY(-1px);
+}
+
+.user-form-card button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #e5eaf0;
+  border-radius: 14px;
+  background: #ffffff;
+  transition: 0.2s ease;
+}
+
+.user-item:hover {
+  border-color: #bae6fd;
+  background: #f8fbff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+  transform: translateY(-1px);
+}
+
+.user-number {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 10px;
+  background: #f0f9ff;
+  color: #0284c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-info h4 {
+  margin: 0;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.user-info p {
+  margin: 5px 0 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.role-badge {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.role-admin {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.role-dosen {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.role-mahasiswa {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.role-default {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.loading-state {
+  padding: 28px;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #64748b;
+  text-align: center;
+  font-size: 15px;
+  border: 1px solid #e5eaf0;
+}
+
+.empty-state {
+  padding: 42px 24px;
+  border-radius: 16px;
+  border: 1px dashed #cbd5e1;
+  background: #ffffff;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.empty-state h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #0f172a;
+}
+
+.empty-state p {
+  margin: 8px auto 0;
+  max-width: 420px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #64748b;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+@media (max-width: 1024px) {
+  .user-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .user-page {
+    padding: 18px;
+  }
+
+  .user-card {
+    padding: 22px;
+    border-radius: 14px;
+  }
+
+  .user-header {
+    flex-direction: column;
+  }
+
+  .user-header h2 {
+    font-size: 24px;
+  }
+
+  .user-form-card,
+  .user-list-card {
+    padding: 18px;
+  }
+
+  .user-item {
+    align-items: flex-start;
+  }
+
+  .role-badge {
+    align-self: flex-start;
+  }
+}
