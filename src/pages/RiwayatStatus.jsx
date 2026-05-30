@@ -179,6 +179,7 @@ export default function RiwayatStatus() {
     if (value === 'draft') return 'status-draft';
     if (value === 'diajukan') return 'status-diajukan';
     if (value === 'disetujui' || value === 'setuju') return 'status-disetujui';
+    if (value === 'validated') return 'status-disetujui';
     if (value === 'ditolak' || value === 'tolak') return 'status-ditolak';
     if (value === 'revisi') return 'status-revisi';
 
@@ -201,6 +202,7 @@ export default function RiwayatStatus() {
     const value = (status || '').toLowerCase();
 
     if (value === 'disetujui' || value === 'setuju') return 'Disetujui';
+    if (value === 'validated') return 'Tervalidasi';
     if (value === 'ditolak' || value === 'tolak') return 'Ditolak';
     if (value === 'draft') return 'Draft';
     if (value === 'diajukan') return 'Diajukan';
@@ -272,7 +274,10 @@ export default function RiwayatStatus() {
     }
   }, [token]);
 
-  const canModify = () => true;
+  const canModify = (status) => {
+    const value = (status || '').toLowerCase();
+    return value === 'draft' || value === 'revisi';
+  };
 
   const openEdit = (item) => {
     setSelected(item);
@@ -369,13 +374,7 @@ export default function RiwayatStatus() {
                     </span>
                   </div>
 
-                  {it.ringkasan && (
-                    <p className="riwayat-ringkasan">
-                      {it.ringkasan}
-                    </p>
-                  )}
-
-                  {!it.ringkasan && it.abstract && (
+                  {it.abstract && (
                     <p className="riwayat-ringkasan">
                       {it.abstract}
                     </p>

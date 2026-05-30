@@ -30,7 +30,6 @@ export default function FormPengajuan() {
       const payloadBase = {
         judul,
         abstract,
-        ringkasan: abstract,
         pembimbing1_id: pembimbing1 || undefined,
         pembimbing2_id: pembimbing2 || undefined,
       };

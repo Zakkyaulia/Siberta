@@ -158,6 +158,7 @@ export default function DaftarMasuk() {
     if (value === 'diajukan') return 'status-diajukan';
     if (value === 'disetujui') return 'status-disetujui';
     if (value === 'setuju') return 'status-disetujui';
+    if (value === 'validated') return 'status-disetujui';
     if (value === 'ditolak') return 'status-ditolak';
     if (value === 'tolak') return 'status-ditolak';
     if (value === 'revisi') return 'status-revisi';
@@ -266,9 +267,9 @@ export default function DaftarMasuk() {
                     </span>
                   </div>
 
-                  {item.ringkasan && (
+                  {item.abstract && (
                     <p className="daftar-ringkasan">
-                      {item.ringkasan}
+                      {item.abstract}
                     </p>
                   )}
 
