@@ -102,6 +102,8 @@ function EditPengajuanModal({ open, onClose, submission, dosen, onSaved, onDownl
   const [pembimbing1, setPembimbing1] = useState(() => submission?.pembimbing1_id || '');
   const [pembimbing2, setPembimbing2] = useState(() => submission?.pembimbing2_id || '');
   const [newFile, setNewFile] = useState(null);
+  const [existingFile, setExistingFile] = useState(() => submission?.legacy_file || null);
+  const [isDeletedExisting, setIsDeletedExisting] = useState(false);
   const [saving, setSaving] = useState(false);
 
   if (!open || !submission) return null;
@@ -148,6 +150,7 @@ function EditPengajuanModal({ open, onClose, submission, dosen, onSaved, onDownl
         tema,
         pembimbing1_id: pembimbing1 || null,
         pembimbing2_id: pembimbing2 || null,
+        file_pendukung: isDeletedExisting ? null : undefined,
       });
 
       if (newFile) {
@@ -193,10 +196,10 @@ function EditPengajuanModal({ open, onClose, submission, dosen, onSaved, onDownl
         <div className="riwayat-modal-header">
           <div>
             <h3>Edit Pengajuan</h3>
-            <p>Perbarui data pengajuan dan lihat file pendukung yang sudah diunggah.</p>
+            <p>Perbarui data pengajuan dan kelola file pendukung.</p>
           </div>
           <button type="button" className="riwayat-modal-close" onClick={onClose}>
-            x
+            &times;
           </button>
         </div>
 
@@ -274,27 +277,105 @@ function EditPengajuanModal({ open, onClose, submission, dosen, onSaved, onDownl
             </div>
           </div>
 
-          <div className="riwayat-form-group">
-            <label>File Pendukung Saat Ini</label>
-            <FileList submission={submission} onDownloadFile={onDownloadFile} />
-          </div>
+          {existingFile && (
+            <div className="riwayat-form-group">
+              <label>File Pendukung Saat Ini</label>
+              <div className="existing-file-card">
+                <div
+                  className="existing-file-info"
+                  onClick={() => onDownloadFile(existingFile, submission.id)}
+                  role="button"
+                  title="Unduh file saat ini"
+                >
+                  <FileText size={18} />
+                  <span className="existing-file-name">{existingFile.filename}</span>
+                </div>
+                <button
+                  type="button"
+                  className="existing-file-delete-btn"
+                  onClick={() => {
+                    Swal.fire({
+                      icon: 'warning',
+                      title: 'Hapus file pendukung?',
+                      text: 'File lama akan dihapus permanen setelah Anda menyimpan perubahan.',
+                      showCancelButton: true,
+                      confirmButtonText: 'Ya, Hapus',
+                      cancelButtonText: 'Batal',
+                      reverseButtons: true,
+                    }).then((res) => {
+                      if (res.isConfirmed) {
+                        setExistingFile(null);
+                        setIsDeletedExisting(true);
+                      }
+                    });
+                  }}
+                  title="Hapus file ini"
+                >
+                  &times;
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="riwayat-form-group">
             <label htmlFor="edit-file">Ganti atau Tambah File</label>
-            <label htmlFor="edit-file" className="file-dropzone" role="button" tabIndex={0}>
+            <label
+              htmlFor={existingFile ? undefined : "edit-file"}
+              className={`file-upload-dropzone ${existingFile ? 'disabled' : ''}`}
+              role="button"
+              tabIndex={0}
+              onClick={(e) => {
+                if (existingFile) {
+                  e.preventDefault();
+                  Swal.fire({
+                    icon: 'warning',
+                    title: 'Hapus file lama terlebih dahulu',
+                    text: 'Silakan hapus file pendukung saat ini sebelum memilih file baru.',
+                    confirmButtonText: 'Mengerti',
+                  });
+                }
+              }}
+            >
               <input
                 id="edit-file"
                 type="file"
-                onChange={(e) => setNewFile(e.target.files?.[0] || null)}
+                accept=".pdf"
+                disabled={!!existingFile}
+                onChange={(e) => {
+                  const selectedFile = e.target.files?.[0] || null;
+                  if (selectedFile && selectedFile.type !== 'application/pdf') {
+                    Swal.fire({
+                      icon: 'error',
+                      title: 'Format tidak didukung',
+                      text: 'Hanya file PDF yang diperbolehkan.',
+                      confirmButtonText: 'OK',
+                    });
+                    e.target.value = '';
+                    setNewFile(null);
+                    return;
+                  }
+                  setNewFile(selectedFile);
+                }}
+                style={{ display: 'none' }}
               />
-              <div className="file-dropzone-title">
-                {newFile ? newFile.name : 'Klik area ini untuk upload file baru'}
+
+              <div className="file-upload-icon-wrap">
+                <FileText size={28} className="file-upload-icon" />
               </div>
-              <div className="file-dropzone-subtitle">
-                {newFile ? 'File siap disimpan' : 'Tanpa tombol choose file, cukup klik area ini'}
+
+              <div className="file-upload-title">
+                {newFile ? newFile.name : 'Klik area ini untuk unggah dokumen baru'}
+              </div>
+
+              <div className="file-upload-subtitle">
+                {newFile ? 'Dokumen PDF siap disimpan' : 'Format file wajib .pdf'}
               </div>
             </label>
-            <small>{newFile ? `File baru: ${newFile.name}` : 'Opsional. File baru akan ditambahkan ke pengajuan ini.'}</small>
+            <small>
+              {newFile
+                ? `File baru siap diunggah: ${newFile.name}`
+                : 'Opsional. Dokumen baru berformat PDF untuk melengkapi pengajuan.'}
+            </small>
           </div>
 
           <div className="riwayat-modal-actions">
@@ -428,6 +509,11 @@ export default function RiwayatStatus() {
   const canModify = (status) => {
     const value = (status || '').toLowerCase();
     return value === 'draft' || value === 'revisi';
+  };
+
+  const canDelete = (status) => {
+    const value = (status || '').toLowerCase();
+    return value === 'draft' || value === 'revisi' || value === 'diajukan' || value === 'menunggu_pembimbing';
   };
 
   const openEdit = (item) => {
@@ -579,7 +665,7 @@ export default function RiwayatStatus() {
                       type="button"
                       className="riwayat-btn riwayat-btn-delete"
                       onClick={() => handleDelete(it)}
-                      disabled={!canModify(it.status)}
+                      disabled={!canDelete(it.status)}
                     >
                       Hapus
                     </button>

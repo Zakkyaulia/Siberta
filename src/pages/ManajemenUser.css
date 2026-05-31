@@ -274,6 +274,50 @@ textarea {
   font-family: inherit;
 }
 
+
+/* Pagination styling */
+.user-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.user-pagination button {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #d8e0ea;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #0f172a;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s ease;
+}
+
+.user-pagination button:hover:not(:disabled) {
+  border-color: #0ea5e9;
+  color: #0284c7;
+  background: #f0f9ff;
+}
+
+.user-pagination button:disabled {
+  color: #cbd5e1;
+  background: #f8fafc;
+  cursor: not-allowed;
+}
+
+.user-pagination span {
+  min-width: 128px;
+  text-align: center;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+}
+
 @media (max-width: 1024px) {
   .user-layout {
     grid-template-columns: 1fr;
@@ -309,5 +353,9 @@ textarea {
 
   .role-badge {
     align-self: flex-start;
+  }
+
+  .user-pagination {
+    justify-content: center;
   }
 }

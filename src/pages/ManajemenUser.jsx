@@ -2,7 +2,10 @@ import React, { useEffect, useState } from 'react';
 import api, { setAuthToken } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import './ManajemenUser.css';
+
+const PAGE_SIZE = 10;
 
 export default function ManajemenUser() {
   const { token } = useAuth();
@@ -17,6 +20,7 @@ export default function ManajemenUser() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const loadUsers = async () => {
     try {
@@ -94,6 +98,15 @@ export default function ManajemenUser() {
     if (value === 'mahasiswa') return 'role-mahasiswa';
 
     return 'role-default';
+  };
+
+  const totalPages = Math.max(1, Math.ceil(users.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const pageStart = (safePage - 1) * PAGE_SIZE;
+  const pageItems = users.slice(pageStart, pageStart + PAGE_SIZE);
+
+  const goToPage = (page) => {
+    setCurrentPage(Math.min(Math.max(page, 1), totalPages));
   };
 
   return (
@@ -197,24 +210,44 @@ export default function ManajemenUser() {
             )}
 
             {!loading && users.length > 0 && (
-              <div className="user-list">
-                {users.map((u, index) => (
-                  <div className="user-item" key={u.id}>
-                    <div className="user-number">
-                      {index + 1}
-                    </div>
+              <>
+                <div className="user-list">
+                  {pageItems.map((u, index) => (
+                    <div className="user-item" key={u.id}>
+                      <div className="user-number">
+                        {pageStart + index + 1}
+                      </div>
 
-                    <div className="user-info">
-                      <h4>{u.nama}</h4>
-                      <p>@{u.username}</p>
-                    </div>
+                      <div className="user-info">
+                        <h4>{u.nama}</h4>
+                        <p>@{u.username}</p>
+                      </div>
 
-                    <span className={`role-badge ${getRoleClass(u.role)}`}>
-                      {u.role}
-                    </span>
-                  </div>
-                ))}
-              </div>
+                      <span className={`role-badge ${getRoleClass(u.role)}`}>
+                        {u.role}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="user-pagination">
+                  <button type="button" onClick={() => goToPage(1)} disabled={safePage === 1}>
+                    <ChevronsLeft size={16} />
+                  </button>
+                  <button type="button" onClick={() => goToPage(safePage - 1)} disabled={safePage === 1}>
+                    <ChevronLeft size={16} />
+                  </button>
+
+                  <span>Halaman {safePage} dari {totalPages}</span>
+
+                  <button type="button" onClick={() => goToPage(safePage + 1)} disabled={safePage === totalPages}>
+                    <ChevronRight size={16} />
+                  </button>
+                  <button type="button" onClick={() => goToPage(totalPages)} disabled={safePage === totalPages}>
+                    <ChevronsRight size={16} />
+                  </button>
+                </div>
+              </>
             )}
           </div>
         </div>

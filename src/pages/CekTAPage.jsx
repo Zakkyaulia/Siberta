@@ -62,8 +62,23 @@ const TEMA_OPTIONS = [
 
 const normalizeTitle = (value) => value.trim().replace(/\s+/g, ' ').toLowerCase();
 
+function getMappedPercentage(score) {
+  const s = Math.min(100, Math.max(0, Number(score) || 0));
+  if (s <= 70) {
+    // Rendah (0-70%): dipetakan ke 0% - 33.33%
+    return (s / 70) * 33.333;
+  } else if (s <= 85) {
+    // Sedang (>70-85%): dipetakan ke 33.33% - 66.67%
+    return 33.333 + ((s - 70) / 15) * 33.333;
+  } else {
+    // Tinggi (>85-100%): dipetakan ke 66.67% - 100%
+    return 66.667 + ((s - 85) / 15) * 33.333;
+  }
+}
+
 function getScoreMeta(score, statusCode) {
-  if (statusCode === 'MERAH' || score >= 85) {
+  const s = Number(score) || 0;
+  if (statusCode === 'MERAH' || (statusCode ? false : s > 85)) {
     return {
       color: 'danger',
       label: 'Kemiripan Tinggi',
@@ -72,7 +87,7 @@ function getScoreMeta(score, statusCode) {
     };
   }
 
-  if (statusCode === 'KUNING' || score >= 70) {
+  if (statusCode === 'KUNING' || (statusCode ? false : s > 70)) {
     return {
       color: 'warning',
       label: 'Kemiripan Sedang',
@@ -92,9 +107,9 @@ function getScoreMeta(score, statusCode) {
 function SimilarityGauge({ score, color }) {
   const colors = {
     danger: {
-      ring: '#f97316',
-      bg: '#ffedd5',
-      text: '#c2410c',
+      ring: '#ef4444',
+      bg: '#fee2e2',
+      text: '#b91c1c',
     },
     warning: {
       ring: '#f59e0b',
@@ -111,7 +126,8 @@ function SimilarityGauge({ score, color }) {
   const c = colors[color] || colors.success;
   const safeScore = Math.min(100, Math.max(0, Number(score) || 0));
   const circumference = 2 * Math.PI * 52;
-  const offset = circumference - (safeScore / 100) * circumference;
+  const mappedPercentage = getMappedPercentage(safeScore);
+  const offset = circumference - (mappedPercentage / 100) * circumference;
 
   return (
     <div className="gauge-wrap">
@@ -175,8 +191,8 @@ function SimilarityGauge({ score, color }) {
 
 function MatchCard({ match, delay }) {
   const getScoreColor = (score) => {
-    if (score >= 85) return 'danger';
-    if (score >= 70) return 'warning';
+    if (score > 85) return 'danger';
+    if (score > 70) return 'warning';
     return 'success';
   };
 
@@ -214,7 +230,7 @@ function MatchCard({ match, delay }) {
             <div
               className={`match-progress-fill match-fill-${color}`}
               style={{
-                width: `${match.similarity}%`,
+                width: `${getMappedPercentage(match.similarity)}%`,
               }}
             />
           </div>
@@ -244,6 +260,19 @@ export default function CekTAPage() {
     if (!result?.checkedTitle) return false;
     return normalizeTitle(result.checkedTitle) !== normalizeTitle(judulTA);
   }, [judulTA, result]);
+
+  const uniquenessScore = useMemo(() => {
+    if (!result) return 0;
+    const scoreVal = Number(result.score) || 0;
+    return (100 - scoreVal).toFixed(2);
+  }, [result]);
+
+  const kelayakanStatus = useMemo(() => {
+    if (!result) return { text: '', colorClass: '' };
+    if (result.color === 'danger') return { text: 'Revisi', colorClass: 'text-danger' };
+    if (result.color === 'warning') return { text: 'Tinjau', colorClass: 'text-warning' };
+    return { text: 'Layak', colorClass: 'text-success' };
+  }, [result]);
 
   const selectedTema = TEMA_OPTIONS.find((item) => item.value === tema);
 
@@ -645,10 +674,10 @@ export default function CekTAPage() {
               <div className="result-stats-row">
                 <div className="result-stat">
                   <span className="result-stat-val">
-                    {result.matches.length}
+                    {uniquenessScore}%
                   </span>
                   <span className="result-stat-lbl">
-                    TA Mirip
+                    Tingkat Keunikan
                   </span>
                 </div>
 
@@ -657,16 +686,16 @@ export default function CekTAPage() {
                     {result.score}%
                   </span>
                   <span className="result-stat-lbl">
-                    Skor Tertinggi
+                    Skor Tertinggi Kemiripan
                   </span>
                 </div>
 
                 <div className="result-stat">
-                  <span className="result-stat-val">
-                    {mode === 'submit' ? 'Siap' : 'Cek'}
+                  <span className={`result-stat-val ${kelayakanStatus.colorClass}`}>
+                    {kelayakanStatus.text}
                   </span>
                   <span className="result-stat-lbl">
-                    Mode Saat Ini
+                    Status Kelayakan
                   </span>
                 </div>
               </div>
@@ -681,17 +710,26 @@ export default function CekTAPage() {
                   <div
                     className={`result-bar-fill result-fill-${result.color}`}
                     style={{
-                      width: `${result.score}%`,
+                      width: `${getMappedPercentage(result.score)}%`,
                     }}
                   />
+                  <div className="result-bar-divider" style={{ left: '33.333%' }} />
+                  <div className="result-bar-divider" style={{ left: '66.667%' }} />
                 </div>
 
-                <div className="result-bar-scale">
-                  <span>0%</span>
-                  <span className="scale-low">Rendah</span>
-                  <span className="scale-mid">Sedang</span>
-                  <span className="scale-high">Tinggi</span>
-                  <span>100%</span>
+                <div className="result-bar-scale-segmented">
+                  <div className={`scale-segment-col text-left ${result.color === 'success' ? 'active' : 'dimmed'}`}>
+                    <span className="scale-label-name low">Rendah</span>
+                    <span className="scale-label-range">0% - 70%</span>
+                  </div>
+                  <div className={`scale-segment-col text-center ${result.color === 'warning' ? 'active' : 'dimmed'}`}>
+                    <span className="scale-label-name mid">Sedang</span>
+                    <span className="scale-label-range">&gt;70% - 85%</span>
+                  </div>
+                  <div className={`scale-segment-col text-right ${result.color === 'danger' ? 'active' : 'dimmed'}`}>
+                    <span className="scale-label-name high">Tinggi</span>
+                    <span className="scale-label-range">&gt;85% - 100%</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -942,15 +980,29 @@ export default function CekTAPage() {
               <input
                 id="file_pendukung"
                 type="file"
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                accept=".pdf"
+                onChange={(e) => {
+                  const selectedFile = e.target.files?.[0] || null;
+                  if (selectedFile && selectedFile.type !== 'application/pdf') {
+                    toast.error('Hanya file PDF yang diperbolehkan.');
+                    e.target.value = '';
+                    setFile(null);
+                    return;
+                  }
+                  setFile(selectedFile);
+                }}
               />
 
+              <div className="file-upload-icon-wrap">
+                <FileText size={28} className="file-upload-icon" />
+              </div>
+
               <div className="file-upload-title">
-                {file ? file.name : 'Klik area ini untuk upload file'}
+                {file ? file.name : 'Klik area ini untuk unggah dokumen'}
               </div>
 
               <div className="file-upload-subtitle">
-                {file ? 'File siap dikirim' : 'Tanpa tombol choose file, cukup klik area ini'}
+                {file ? 'Dokumen PDF siap dikirim' : 'format file .pdf'}
               </div>
             </label>
 
