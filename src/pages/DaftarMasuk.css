@@ -119,6 +119,12 @@ select {
   color: #64748b;
 }
 
+.daftar-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .daftar-ringkasan {
   margin: 12px 0 0;
   font-size: 14px;
@@ -289,6 +295,10 @@ select {
   margin-bottom: 18px;
 }
 
+.review-info-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .review-info div {
   padding: 14px;
   border-radius: 12px;
@@ -342,6 +352,17 @@ select {
   line-height: 1.5;
 }
 
+.review-form-group textarea:disabled {
+  background: #f8fafc;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.review-form-group small {
+  color: #64748b;
+  font-size: 12px;
+}
+
 .review-form-group select:focus,
 .review-form-group textarea:focus {
   border-color: #0ea5e9;
@@ -390,6 +411,119 @@ select {
   cursor: not-allowed;
 }
 
+.review-section {
+  margin-bottom: 18px;
+}
+
+.review-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: #0f2544;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.advisor-review-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.review-section .advisor-review-list {
+  margin-top: 0;
+}
+
+.advisor-review-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #e5eaf0;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.advisor-review-item.current {
+  border-color: #7dd3fc;
+  background: #f0f9ff;
+}
+
+.advisor-review-item span {
+  display: block;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.advisor-review-item strong {
+  display: block;
+  color: #0f172a;
+  font-size: 13.5px;
+  margin-top: 3px;
+}
+
+.decision-chip {
+  flex-shrink: 0;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+
+.decision-setuju {
+  background: #dcfce7;
+  color: #15803d !important;
+}
+
+.decision-revisi {
+  background: #fef3c7;
+  color: #b45309 !important;
+}
+
+.decision-tolak {
+  background: #fee2e2;
+  color: #b91c1c !important;
+}
+
+.decision-menunggu {
+  background: #e2e8f0;
+  color: #475569 !important;
+}
+
+.review-muted {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.review-file-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.review-file-list button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid #bae6fd;
+  border-radius: 999px;
+  padding: 7px 11px;
+  background: #f0f9ff;
+  color: #0369a1;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.review-file-list button:hover {
+  background: #e0f2fe;
+}
+
 @media (max-width: 768px) {
   .daftar-page {
     padding: 18px;
@@ -418,6 +552,11 @@ select {
   }
 
   .review-info {
+    grid-template-columns: 1fr;
+  }
+
+  .review-info-grid,
+  .advisor-review-list {
     grid-template-columns: 1fr;
   }
 

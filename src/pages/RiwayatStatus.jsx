@@ -1,30 +1,109 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import api, { setAuthToken } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import Swal from 'sweetalert2';
+import {
+  Download,
+  FileText,
+  Layers,
+  Search,
+  Upload,
+  Users,
+} from 'lucide-react';
 import './RiwayatStatus.css';
 
-function EditPengajuanModal({ open, onClose, submission, dosen, onSaved }) {
-  const [judul, setJudul] = useState('');
-  const [abstract, setAbstract] = useState('');
-  const [pembimbing1, setPembimbing1] = useState('');
-  const [pembimbing2, setPembimbing2] = useState('');
+const TEMA_OPTIONS = [
+  { value: 'EA', label: 'EA (System Development)' },
+  { value: 'BI', label: 'BI (Business Intelligence)' },
+  { value: 'ML', label: 'ML (Machine Learning)' },
+  { value: 'SPK', label: 'SPK (Sistem Penunjang Keputusan)' },
+  { value: 'ERP', label: 'ERP' },
+];
+
+const TEMA_LABEL = TEMA_OPTIONS.reduce((acc, item) => {
+  acc[item.value] = item.label;
+  return acc;
+}, {});
+
+const formatDecision = (decision) => {
+  const value = (decision || '').toLowerCase();
+
+  if (value === 'setuju') return 'Setuju';
+  if (value === 'revisi') return 'Revisi';
+  if (value === 'tolak') return 'Tolak';
+
+  return 'Menunggu';
+};
+
+const getAllFiles = (submission) => {
+  const legacy = submission?.legacy_file
+    ? [{ ...submission.legacy_file, is_legacy: true }]
+    : [];
+
+  return legacy;
+};
+
+function AdvisorStatus({ submission }) {
+  const reviews = submission?.advisor_reviews || {};
+
+  return (
+    <div className="riwayat-advisors">
+      {['pembimbing1', 'pembimbing2'].map((key) => {
+        const item = reviews[key];
+        if (!item) return null;
+
+        return (
+          <div key={key} className="riwayat-advisor">
+            <div>
+              <span>{item.label}</span>
+              <strong>{item.nama || item.username || '-'}</strong>
+            </div>
+            <span className={`decision-chip decision-${item.status || 'menunggu'}`}>
+              {formatDecision(item.decision)}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function FileList({ submission, onDownloadFile }) {
+  const files = getAllFiles(submission);
+
+  if (files.length === 0) {
+    return (
+      <div className="riwayat-file-empty">
+        <FileText size={15} />
+        Tidak ada file pendukung.
+      </div>
+    );
+  }
+
+  return (
+    <div className="riwayat-file-list">
+      {files.map((file, index) => (
+        <button
+          type="button"
+          key={`${file.filename}-${index}`}
+          onClick={() => onDownloadFile(file, submission.id)}
+        >
+          <Download size={14} />
+          {file.filename || `File ${index + 1}`}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function EditPengajuanModal({ open, onClose, submission, dosen, onSaved, onDownloadFile }) {
+  const [judul, setJudul] = useState(() => submission?.judul || '');
+  const [abstract, setAbstract] = useState(() => submission?.abstract || '');
+  const [tema, setTema] = useState(() => submission?.tema || '');
+  const [pembimbing1, setPembimbing1] = useState(() => submission?.pembimbing1_id || '');
+  const [pembimbing2, setPembimbing2] = useState(() => submission?.pembimbing2_id || '');
+  const [newFile, setNewFile] = useState(null);
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    if (submission) {
-      setJudul(submission.judul || '');
-      setAbstract(submission.abstract || '');
-      setPembimbing1(submission.pembimbing1_id || '');
-      setPembimbing2(submission.pembimbing2_id || '');
-    }
-  }, [submission]);
-
-  useEffect(() => {
-    if (!open) {
-      setSaving(false);
-    }
-  }, [open]);
 
   if (!open || !submission) return null;
 
@@ -41,15 +120,44 @@ function EditPengajuanModal({ open, onClose, submission, dosen, onSaved }) {
       return;
     }
 
+    if (!tema) {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Tema wajib dipilih',
+        text: 'Pilih salah satu tema TA sebelum menyimpan perubahan.',
+        confirmButtonText: 'Mengerti',
+      });
+      return;
+    }
+
+    if (pembimbing2 && String(pembimbing1) === String(pembimbing2)) {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Pembimbing tidak valid',
+        text: 'Pembimbing 1 dan pembimbing 2 tidak boleh sama.',
+        confirmButtonText: 'Mengerti',
+      });
+      return;
+    }
+
     setSaving(true);
 
     try {
       await api.put(`/api/pengajuan/${submission.id}`, {
         judul,
         abstract,
+        tema,
         pembimbing1_id: pembimbing1 || null,
         pembimbing2_id: pembimbing2 || null,
       });
+
+      if (newFile) {
+        const formData = new FormData();
+        formData.append('file_pendukung', newFile);
+        await api.post(`/api/pengajuan/${submission.id}/upload`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      }
 
       await Swal.fire({
         icon: 'success',
@@ -57,6 +165,7 @@ function EditPengajuanModal({ open, onClose, submission, dosen, onSaved }) {
         text: 'Perubahan berhasil disimpan.',
         confirmButtonText: 'OK',
       });
+
       if (onSaved) {
         await onSaved();
       }
@@ -85,10 +194,10 @@ function EditPengajuanModal({ open, onClose, submission, dosen, onSaved }) {
         <div className="riwayat-modal-header">
           <div>
             <h3>Edit Pengajuan</h3>
-            <p>Perbarui data judul kapan saja sesuai kebutuhan.</p>
+            <p>Perbarui data pengajuan dan lihat file pendukung yang sudah diunggah.</p>
           </div>
           <button type="button" className="riwayat-modal-close" onClick={onClose}>
-            ×
+            x
           </button>
         </div>
 
@@ -103,6 +212,22 @@ function EditPengajuanModal({ open, onClose, submission, dosen, onSaved }) {
               placeholder="Masukkan judul tugas akhir"
               required
             />
+          </div>
+
+          <div className="riwayat-form-group">
+            <label htmlFor="edit-tema">Tema TA</label>
+            <select
+              id="edit-tema"
+              value={tema}
+              onChange={(e) => setTema(e.target.value)}
+            >
+              <option value="">Pilih tema TA</option>
+              {TEMA_OPTIONS.map((item) => (
+                <option key={item.value} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="riwayat-form-group">
@@ -124,7 +249,7 @@ function EditPengajuanModal({ open, onClose, submission, dosen, onSaved }) {
                 value={pembimbing1}
                 onChange={(e) => setPembimbing1(e.target.value)}
               >
-                <option value="">-- Pilih Pembimbing --</option>
+                <option value="">Pilih pembimbing</option>
                 {dosen.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.nama} ({d.username})
@@ -140,7 +265,7 @@ function EditPengajuanModal({ open, onClose, submission, dosen, onSaved }) {
                 value={pembimbing2}
                 onChange={(e) => setPembimbing2(e.target.value)}
               >
-                <option value="">-- Pilih Pembimbing Opsional --</option>
+                <option value="">Opsional</option>
                 {dosen.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.nama} ({d.username})
@@ -148,6 +273,24 @@ function EditPengajuanModal({ open, onClose, submission, dosen, onSaved }) {
                 ))}
               </select>
             </div>
+          </div>
+
+          <div className="riwayat-form-group">
+            <label>File Pendukung Saat Ini</label>
+            <FileList submission={submission} onDownloadFile={onDownloadFile} />
+          </div>
+
+          <div className="riwayat-form-group">
+            <label htmlFor="edit-file">Ganti atau Tambah File</label>
+            <div className="riwayat-file-input">
+              <Upload size={16} />
+              <input
+                id="edit-file"
+                type="file"
+                onChange={(e) => setNewFile(e.target.files?.[0] || null)}
+              />
+            </div>
+            <small>{newFile ? `File baru: ${newFile.name}` : 'Opsional. File baru akan ditambahkan ke pengajuan ini.'}</small>
           </div>
 
           <div className="riwayat-modal-actions">
@@ -177,7 +320,7 @@ export default function RiwayatStatus() {
     const value = (status || '').toLowerCase();
 
     if (value === 'draft') return 'status-draft';
-    if (value === 'diajukan') return 'status-diajukan';
+    if (value === 'diajukan' || value === 'menunggu_pembimbing') return 'status-diajukan';
     if (value === 'disetujui' || value === 'setuju') return 'status-disetujui';
     if (value === 'validated') return 'status-disetujui';
     if (value === 'ditolak' || value === 'tolak') return 'status-ditolak';
@@ -202,77 +345,81 @@ export default function RiwayatStatus() {
     const value = (status || '').toLowerCase();
 
     if (value === 'disetujui' || value === 'setuju') return 'Disetujui';
-    if (value === 'validated') return 'Tervalidasi';
+    if (value === 'validated') return 'Tersinkron';
     if (value === 'ditolak' || value === 'tolak') return 'Ditolak';
     if (value === 'draft') return 'Draft';
     if (value === 'diajukan') return 'Diajukan';
+    if (value === 'menunggu_pembimbing') return 'Menunggu Pembimbing';
     if (value === 'revisi') return 'Revisi';
 
     return status || 'Tidak diketahui';
   };
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        setLoading(true);
-        setAuthToken(token);
+  const loadItems = useCallback(async () => {
+    try {
+      setLoading(true);
+      setAuthToken(token);
 
-        const res = await api.get('/api/pengajuan');
-        setItems(res.data.data || []);
-      } catch (err) {
-        console.error(err);
-        await Swal.fire({
-          icon: 'error',
-          title: 'Gagal memuat riwayat',
-          text: 'Coba muat ulang halaman atau periksa koneksi backend.',
-          confirmButtonText: 'Tutup',
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const loadDosen = async () => {
-      const pickDosenFromResponse = (payload) => {
-        const list = Array.isArray(payload?.data) ? payload.data : [];
-
-        return list.filter(
-          (u) => (u?.role || '').toLowerCase() === 'dosen'
-        );
-      };
-
-      const endpoints = [
-        '/api/auth/dosen',
-        '/api/dosen',
-        '/api/users/dosen',
-        '/api/admin/users',
-      ];
-
-      for (const endpoint of endpoints) {
-        try {
-          const res = await api.get(endpoint);
-          const list = pickDosenFromResponse(res.data);
-
-          if (list.length > 0) {
-            setDosen(list);
-            return;
-          }
-        } catch (err) {
-          console.warn(
-            `Gagal ambil dosen dari ${endpoint}`,
-            err?.response?.status || err?.message
-          );
-        }
-      }
-
-      setDosen([]);
-    };
-
-    if (token) {
-      load();
-      loadDosen();
+      const res = await api.get('/api/pengajuan');
+      setItems(res.data.data || []);
+    } catch (err) {
+      console.error(err);
+      await Swal.fire({
+        icon: 'error',
+        title: 'Gagal memuat riwayat',
+        text: 'Coba muat ulang halaman atau periksa koneksi backend.',
+        confirmButtonText: 'Tutup',
+      });
+    } finally {
+      setLoading(false);
     }
   }, [token]);
+
+  const loadDosen = useCallback(async () => {
+    try {
+      const res = await api.get('/api/auth/dosen');
+      const list = Array.isArray(res.data?.data) ? res.data.data : [];
+      setDosen(list.filter((u) => (u?.role || '').toLowerCase() === 'dosen'));
+    } catch (err) {
+      console.warn('Gagal ambil dosen', err?.response?.status || err?.message);
+      setDosen([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (token) {
+      setAuthToken(token);
+      const timer = window.setTimeout(() => {
+        loadItems();
+        loadDosen();
+      }, 0);
+
+      return () => window.clearTimeout(timer);
+    }
+  }, [loadDosen, loadItems, token]);
+
+  const downloadFile = async (file, submissionId) => {
+    try {
+      const endpoint = `/api/pengajuan/${submissionId}/file-pendukung/download`;
+      const response = await api.get(endpoint, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', file.filename || 'file-pendukung');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      await Swal.fire({
+        icon: 'error',
+        title: 'Gagal mengunduh file',
+        text: 'File tidak dapat diunduh saat ini.',
+        confirmButtonText: 'Tutup',
+      });
+    }
+  };
 
   const canModify = (status) => {
     const value = (status || '').toLowerCase();
@@ -312,8 +459,7 @@ export default function RiwayatStatus() {
         confirmButtonText: 'OK',
       });
 
-      const res = await api.get('/api/pengajuan');
-      setItems(res.data.data || []);
+      await loadItems();
     } catch (err) {
       console.error(err);
 
@@ -336,7 +482,7 @@ export default function RiwayatStatus() {
         <div className="riwayat-header">
           <div>
             <h2>Riwayat Status Pengajuan</h2>
-            <p>Pantau perkembangan status judul yang telah diajukan.</p>
+            <p>Pantau status judul, keputusan pembimbing, skor kemiripan, dan file pendukung.</p>
           </div>
 
           <div className="riwayat-count">
@@ -352,7 +498,7 @@ export default function RiwayatStatus() {
 
         {!loading && items.length === 0 && (
           <div className="empty-state">
-            <div className="empty-icon">📄</div>
+            <div className="empty-icon"><FileText size={34} /></div>
             <h3>Belum ada pengajuan</h3>
             <p>Data pengajuan judul akan muncul di halaman ini setelah kamu mengirimkan pengajuan.</p>
           </div>
@@ -374,6 +520,19 @@ export default function RiwayatStatus() {
                     </span>
                   </div>
 
+                  <div className="riwayat-detail-grid">
+                    <div>
+                      <Layers size={14} />
+                      <span>Tema</span>
+                      <strong>{TEMA_LABEL[it.tema] || it.tema || '-'}</strong>
+                    </div>
+                    <div>
+                      <Search size={14} />
+                      <span>Skor Kemiripan</span>
+                      <strong>{it.similarity_score !== null && it.similarity_score !== undefined ? `${it.similarity_score}%` : '-'}</strong>
+                    </div>
+                  </div>
+
                   {it.abstract && (
                     <p className="riwayat-ringkasan">
                       {it.abstract}
@@ -387,8 +546,20 @@ export default function RiwayatStatus() {
                     </div>
                   )}
 
+                  <div className="riwayat-section-label">
+                    <Users size={14} />
+                    Status Pembimbing
+                  </div>
+                  <AdvisorStatus submission={it} />
+
+                  <div className="riwayat-section-label">
+                    <FileText size={14} />
+                    File Pendukung
+                  </div>
+                  <FileList submission={it} onDownloadFile={downloadFile} />
+
                   <div className="riwayat-meta">
-                    <span className="riwayat-date">📅 {formatTanggal(it.created_at)}</span>
+                    <span className="riwayat-date">{formatTanggal(it.created_at)}</span>
                   </div>
 
                   <div className="riwayat-actions">
@@ -417,15 +588,13 @@ export default function RiwayatStatus() {
       </div>
 
       <EditPengajuanModal
+        key={selected?.id || 'empty-edit'}
         open={modalOpen}
         onClose={closeEdit}
         submission={selected}
         dosen={dosen}
-        onSaved={async () => {
-          setAuthToken(token);
-          const res = await api.get('/api/pengajuan');
-          setItems(res.data.data || []);
-        }}
+        onDownloadFile={downloadFile}
+        onSaved={loadItems}
       />
     </div>
   );

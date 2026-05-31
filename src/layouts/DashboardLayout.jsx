@@ -11,14 +11,12 @@ import {
   Menu,
   X,
   LayoutDashboard,
-  FilePlus,
   Clock,
   Inbox,
   BookOpen,
   ShieldCheck,
   Database,
   Users,
-  RefreshCw,
 } from 'lucide-react';
 import './DashboardLayout.css';
 
@@ -60,14 +58,8 @@ const menuConfig = {
     {
       to: '/dashboard/cek-ta',
       icon: Search,
-      label: 'Cek Kemiripan',
-      desc: 'Analisis AI SBERT',
-    },
-    {
-      to: '/dashboard/form-pengajuan',
-      icon: FilePlus,
-      label: 'Ajukan Judul',
-      desc: 'Formulir TA',
+      label: 'Cek & Ajukan TA',
+      desc: 'Analisis dan kirim judul',
     },
     {
       to: '/dashboard/riwayat',
@@ -126,20 +118,14 @@ const menuConfig = {
     {
       to: '/dashboard/master-data',
       icon: Database,
-      label: 'Master Data TA',
-      desc: 'Basis data resmi',
+      label: 'Arsip TA Tersinkron',
+      desc: 'Data TA resmi',
     },
     {
       to: '/dashboard/manajemen-user',
       icon: Users,
       label: 'Manajemen User',
       desc: 'Kelola akun',
-    },
-    {
-      to: '/dashboard/sync-ml',
-      icon: RefreshCw,
-      label: 'Sync Model ML',
-      desc: 'Latih ulang AI',
     },
   ],
 
@@ -165,20 +151,14 @@ const menuConfig = {
     {
       to: '/dashboard/master-data',
       icon: Database,
-      label: 'Master Data TA',
-      desc: 'Basis data resmi',
+      label: 'Arsip TA Tersinkron',
+      desc: 'Data TA resmi',
     },
     {
       to: '/dashboard/manajemen-user',
       icon: Users,
       label: 'Manajemen User',
       desc: 'Kelola akun',
-    },
-    {
-      to: '/dashboard/sync-ml',
-      icon: RefreshCw,
-      label: 'Sync Model ML',
-      desc: 'Latih ulang AI',
     },
   ],
 };
@@ -222,14 +202,14 @@ const menuConfig = {
 
         <nav className="sidebar-nav">
           <span className="nav-section-label">Navigasi Utama</span>
-          {activeMenu.map(({ to, icon: Icon, label, desc }) => (
+          {activeMenu.map(({ to, icon, label, desc }) => (
             <NavLink
               key={to}
               to={to}
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               onClick={() => setSidebarOpen(false)}
             >
-              <div className="nav-item-icon"><Icon size={19} /></div>
+              <div className="nav-item-icon">{React.createElement(icon, { size: 19 })}</div>
               <div className="nav-item-text">
                 <span className="nav-label">{label}</span>
                 <span className="nav-desc">{desc}</span>

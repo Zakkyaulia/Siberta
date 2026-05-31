@@ -123,10 +123,10 @@ export default function MahasiswaDashboard() {
           <div className="quick-actions">
             <button
               type="button"
-              onClick={() => navigate('/dashboard/form-pengajuan')}
+              onClick={() => navigate('/dashboard/cek-ta')}
             >
               <Send size={16} />
-              Ajukan Judul
+              Cek & Ajukan Judul
             </button>
 
             <button

@@ -18,7 +18,6 @@ import ProfilPage from './pages/ProfilPage';
 // Halaman Mahasiswa
 import MahasiswaDashboard from './pages/MahasiswaDashboard';
 import CekTAPage from './pages/CekTAPage';
-import FormPengajuan from './pages/FormPengajuan';
 import RiwayatStatus from './pages/RiwayatStatus';
 import SBERTSim from './pages/SBERTSim';
 
@@ -32,7 +31,6 @@ import AdminDashboard from './pages/AdminDashboard';
 import ValidasiAkhir from './pages/ValidasiAkhir';
 import MasterDataTA from './pages/MasterDataTA';
 import ManajemenUser from './pages/ManajemenUser';
-import SyncML from './pages/SyncML';
 
 function getDashboardPathByRole(role) {
   const normalizedRole = (role || 'mahasiswa').toString().toLowerCase();
@@ -129,7 +127,7 @@ function App() {
             >
               <Route path="mahasiswa" element={<MahasiswaDashboard />} />
               <Route path="cek-ta" element={<CekTAPage />} />
-              <Route path="form-pengajuan" element={<FormPengajuan />} />
+              <Route path="form-pengajuan" element={<Navigate to="/dashboard/cek-ta" replace />} />
               <Route path="riwayat" element={<RiwayatStatus />} />
             </Route>
 
@@ -154,7 +152,6 @@ function App() {
               <Route path="validasi" element={<ValidasiAkhir />} />
               <Route path="master-data" element={<MasterDataTA />} />
               <Route path="manajemen-user" element={<ManajemenUser />} />
-              <Route path="sync-ml" element={<SyncML />} />
             </Route>
           </Route>
 
