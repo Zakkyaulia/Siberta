@@ -194,13 +194,19 @@ export default function FormPengajuan() {
 
           <div className="form-group">
             <label htmlFor="file_pendukung">File Pendukung</label>
-            <div className="file-box">
+            <label htmlFor="file_pendukung" className="file-dropzone" role="button" tabIndex={0}>
               <input
                 id="file_pendukung"
                 type="file"
                 onChange={(e) => setFile(e.target.files[0])}
               />
-            </div>
+              <div className="file-dropzone-title">
+                {file ? file.name : 'Klik area ini untuk upload file pendukung'}
+              </div>
+              <div className="file-dropzone-subtitle">
+                {file ? 'File siap dikirim' : 'Tanpa tombol. Cukup klik area ini'}
+              </div>
+            </label>
             <small>
               Opsional. Lampirkan proposal, referensi, atau dokumen pendukung
               lainnya jika ada.

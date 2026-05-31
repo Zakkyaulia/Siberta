@@ -7,7 +7,6 @@ import {
   FileText,
   Layers,
   Search,
-  Upload,
   Users,
 } from 'lucide-react';
 import './RiwayatStatus.css';
@@ -282,14 +281,19 @@ function EditPengajuanModal({ open, onClose, submission, dosen, onSaved, onDownl
 
           <div className="riwayat-form-group">
             <label htmlFor="edit-file">Ganti atau Tambah File</label>
-            <div className="riwayat-file-input">
-              <Upload size={16} />
+            <label htmlFor="edit-file" className="file-dropzone" role="button" tabIndex={0}>
               <input
                 id="edit-file"
                 type="file"
                 onChange={(e) => setNewFile(e.target.files?.[0] || null)}
               />
-            </div>
+              <div className="file-dropzone-title">
+                {newFile ? newFile.name : 'Klik area ini untuk upload file baru'}
+              </div>
+              <div className="file-dropzone-subtitle">
+                {newFile ? 'File siap disimpan' : 'Tanpa tombol choose file, cukup klik area ini'}
+              </div>
+            </label>
             <small>{newFile ? `File baru: ${newFile.name}` : 'Opsional. File baru akan ditambahkan ke pengajuan ini.'}</small>
           </div>
 

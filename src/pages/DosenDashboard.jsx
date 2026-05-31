@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ClipboardList,
@@ -6,68 +6,126 @@ import {
   CheckCircle2,
   Clock,
   BookOpen,
-  MessageSquareText,
-  FileText,
   ArrowRight,
   CalendarDays,
 } from 'lucide-react';
+import api, { setAuthToken } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import './DosenDashboard.css';
 
 export default function DosenDashboard() {
   const navigate = useNavigate();
+  const { token } = useAuth();
+  const [submissions, setSubmissions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const stats = [
+  useEffect(() => {
+    const loadSubmissions = async () => {
+      if (!token) return;
+
+      setLoading(true);
+      setError('');
+
+      try {
+        setAuthToken(token);
+        const res = await api.get('/api/pengajuan');
+        const list = Array.isArray(res.data?.data) ? res.data.data : [];
+        setSubmissions(list);
+      } catch (err) {
+        console.error(err);
+        const serverMsg = err?.response?.data?.pesan || err?.response?.data?.message;
+        setError(serverMsg || 'Gagal memuat data pengajuan.');
+        setSubmissions([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSubmissions();
+  }, [token]);
+
+  const getAdvisorKey = (submission) => {
+    const position = submission?.current_user_position;
+    if (position === 'Pembimbing 1') return 'pembimbing1';
+    if (position === 'Pembimbing 2') return 'pembimbing2';
+    return null;
+  };
+
+  const needsReview = (submission) => {
+    const key = getAdvisorKey(submission);
+    const review = key ? submission?.advisor_reviews?.[key] : null;
+    if (review?.decision) return false;
+
+    const status = (submission?.status || '').toLowerCase();
+    return status === 'diajukan' || status === 'menunggu_pembimbing' || status === 'revisi';
+  };
+
+  const pendingCount = useMemo(() => submissions.filter(needsReview).length, [submissions]);
+
+  const approvedCount = useMemo(() => submissions.filter((item) => {
+    const status = (item?.status || '').toLowerCase();
+    return status === 'disetujui' || status === 'setuju' || status === 'validated';
+  }).length, [submissions]);
+
+  const uniqueStudents = useMemo(() => {
+    const ids = new Set();
+    submissions.forEach((item) => {
+      const id = item?.student_id || item?.mahasiswa?.id;
+      if (id) ids.add(id);
+    });
+    return ids.size;
+  }, [submissions]);
+
+  const stats = useMemo(() => ([
     {
       title: 'Perlu Ditinjau',
-      value: '2',
+      value: String(pendingCount),
       desc: 'Pengajuan judul menunggu review',
       icon: ClipboardList,
       type: 'blue',
     },
     {
       title: 'Mahasiswa Bimbingan',
-      value: '8',
+      value: String(uniqueStudents),
       desc: 'Mahasiswa aktif dibimbing',
       icon: Users,
       type: 'green',
     },
     {
       title: 'Disetujui',
-      value: '5',
+      value: String(approvedCount),
       desc: 'Judul sudah disetujui',
       icon: CheckCircle2,
       type: 'purple',
     },
-  ];
+  ]), [pendingCount, uniqueStudents, approvedCount]);
 
-  const submissions = [
-    {
-      title: 'Sistem Informasi Booking Jadwal Foto Berbasis Web',
-      student: 'Mahasiswa 1',
-      status: 'Draft',
-      date: '29 Mei 2026',
-    },
-    {
-      title: 'Analisis Kemiripan Topik Tugas Akhir Menggunakan SBERT',
-      student: 'Mahasiswa 2',
-      status: 'Diajukan',
-      date: '29 Mei 2026',
-    },
-    {
-      title: 'Sistem Rekomendasi Judul Tugas Akhir Berbasis Machine Learning',
-      student: 'Mahasiswa 3',
-      status: 'Revisi',
-      date: '28 Mei 2026',
-    },
-  ];
+  const latestSubmissions = useMemo(() => {
+    return [...submissions]
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .slice(0, 3);
+  }, [submissions]);
 
-  const schedules = [
-    {
-      title: 'Review pengajuan judul',
-      time: 'Hari ini',
-      desc: 'Cek pengajuan yang masih menunggu keputusan.',
-    },
-  ];
+  const schedules = useMemo(() => {
+    if (pendingCount > 0) {
+      return [
+        {
+          title: 'Review pengajuan judul',
+          time: 'Hari ini',
+          desc: `Ada ${pendingCount} pengajuan menunggu keputusan.`,
+        },
+      ];
+    }
+
+    return [
+      {
+        title: 'Tidak ada agenda mendesak',
+        time: 'Minggu ini',
+        desc: 'Belum ada pengajuan yang menunggu keputusan Anda.',
+      },
+    ];
+  }, [pendingCount]);
 
   const getStatusClass = (status) => {
     const value = (status || '').toLowerCase();
@@ -83,6 +141,15 @@ export default function DosenDashboard() {
 
   const goToDaftarMasuk = () => {
     navigate('/dashboard/daftar-masuk');
+  };
+
+  const formatDate = (dateValue) => {
+    if (!dateValue) return '-';
+    return new Date(dateValue).toLocaleDateString('id-ID', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    });
   };
 
 
@@ -142,8 +209,50 @@ export default function DosenDashboard() {
           </div>
 
           <div className="submission-list">
-            {submissions.map((item, index) => (
-              <div className="submission-item" key={index}>
+            {loading && (
+              <div className="submission-item">
+                <div className="submission-number">-</div>
+                <div className="submission-content">
+                  <div className="submission-top">
+                    <div>
+                      <h4>Memuat data pengajuan...</h4>
+                      <p>Silakan tunggu sebentar.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!loading && error && (
+              <div className="submission-item">
+                <div className="submission-number">!</div>
+                <div className="submission-content">
+                  <div className="submission-top">
+                    <div>
+                      <h4>Gagal memuat pengajuan</h4>
+                      <p>{error}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!loading && !error && latestSubmissions.length === 0 && (
+              <div className="submission-item">
+                <div className="submission-number">0</div>
+                <div className="submission-content">
+                  <div className="submission-top">
+                    <div>
+                      <h4>Belum ada pengajuan</h4>
+                      <p>Pengajuan mahasiswa akan tampil di sini.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!loading && !error && latestSubmissions.map((item, index) => (
+              <div className="submission-item" key={item.id || index}>
                 <div className="submission-number">
                   {index + 1}
                 </div>
@@ -151,14 +260,14 @@ export default function DosenDashboard() {
                 <div className="submission-content">
                   <div className="submission-top">
                     <div>
-                      <h4>{item.title}</h4>
+                      <h4>{item.judul || '-'}</h4>
                       <p>
-                        {item.student} • {item.date}
+                        {item.mahasiswa?.nama || item.mahasiswa?.username || item.student_id || '-'} • {formatDate(item.created_at)}
                       </p>
                     </div>
 
                     <span className={`status-badge ${getStatusClass(item.status)}`}>
-                      {item.status}
+                      {item.status || '-'}
                     </span>
                   </div>
                 </div>
@@ -201,49 +310,6 @@ export default function DosenDashboard() {
         </div>
       </div>
 
-      <div className="dosen-bottom-grid">
-        <div className="quick-card">
-          <div className="quick-icon">
-            <ClipboardList size={24} />
-          </div>
-
-          <div>
-            <h3>Daftar Masuk</h3>
-            <p>
-              Tinjau pengajuan judul mahasiswa dan berikan keputusan berupa
-              setuju, revisi, atau tolak.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={goToDaftarMasuk}
-          >
-            Buka Daftar Masuk
-          </button>
-        </div>
-
-        <div className="quick-card">
-          <div className="quick-icon">
-            <FileText size={24} />
-          </div>
-
-          <div>
-            <h3>Dokumen Review</h3>
-            <p>
-              Periksa ringkasan dan file pendukung dari pengajuan mahasiswa.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            className="secondary"
-            onClick={goToDaftarMasuk}
-          >
-            Lihat Dokumen
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

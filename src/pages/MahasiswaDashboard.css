@@ -193,6 +193,26 @@ textarea {
   color: #475569;
 }
 
+.status-diajukan {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.status-disetujui {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-revisi {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.status-ditolak {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
 .submission-box {
   display: flex;
   gap: 16px;

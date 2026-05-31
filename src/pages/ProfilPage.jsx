@@ -534,7 +534,7 @@ export default function ProfilPage() {
 
       {renderEditCard()}
 
-      <div className="stats-grid">
+      {/* <div className="stats-grid">
         {STATS.map((stat, index) => (
           <div
             className="stat-card card"
@@ -546,7 +546,7 @@ export default function ProfilPage() {
             <div className="stat-sub">{stat.sub}</div>
           </div>
         ))}
-      </div>
+      </div> */}
 
       <div className="info-grid">
         <div className="info-section card">

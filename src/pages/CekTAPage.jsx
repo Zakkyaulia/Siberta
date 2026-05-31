@@ -3,27 +3,61 @@ import api, { setAuthToken } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import {
   AlertCircle,
+  BarChart3,
   BookOpen,
+  BrainCircuit,
+  Building2,
   CheckCircle2,
   ClipboardCheck,
   FileText,
+  GitBranch,
   Info,
   Layers,
+  MonitorCog,
   Search,
   Send,
   TrendingUp,
-  Upload,
   User,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import './CekTAPage.css';
 
 const TEMA_OPTIONS = [
-  { value: 'EA', label: 'EA', desc: 'System Development' },
-  { value: 'BI', label: 'BI', desc: 'Business Intelligence' },
-  { value: 'ML', label: 'ML', desc: 'Machine Learning' },
-  { value: 'SPK', label: 'SPK', desc: 'Sistem Penunjang Keputusan' },
-  { value: 'ERP', label: 'ERP', desc: 'Enterprise Resource Planning' },
+  {
+    value: 'EA',
+    label: 'EA',
+    desc: 'System Development',
+    detail: 'Pengembangan aplikasi, sistem informasi, dan rekayasa perangkat lunak.',
+    icon: MonitorCog,
+  },
+  {
+    value: 'BI',
+    label: 'BI',
+    desc: 'Business Intelligence',
+    detail: 'Analisis data, dashboard, data warehouse, dan pelaporan bisnis.',
+    icon: BarChart3,
+  },
+  {
+    value: 'ML',
+    label: 'ML',
+    desc: 'Machine Learning',
+    detail: 'Prediksi, klasifikasi, rekomendasi, dan pemodelan berbasis data.',
+    icon: BrainCircuit,
+  },
+  {
+    value: 'SPK',
+    label: 'SPK',
+    desc: 'Sistem Penunjang Keputusan',
+    detail: 'Metode pengambilan keputusan seperti SAW, TOPSIS, AHP, dan sejenisnya.',
+    icon: GitBranch,
+  },
+  {
+    value: 'ERP',
+    label: 'ERP',
+    desc: 'Enterprise Resource Planning',
+    detail: 'Integrasi proses bisnis, modul operasional, dan sistem enterprise.',
+    icon: Building2,
+  },
 ];
 
 const normalizeTitle = (value) => value.trim().replace(/\s+/g, ' ').toLowerCase();
@@ -33,7 +67,8 @@ function getScoreMeta(score, statusCode) {
     return {
       color: 'danger',
       label: 'Kemiripan Tinggi',
-      description: 'Judul memiliki kemiripan tinggi dengan data TA sebelumnya. Revisi fokus, metode, atau studi kasus sebelum diajukan.',
+      description:
+        'Judul memiliki kemiripan tinggi dengan data TA sebelumnya. Revisi fokus, metode, atau studi kasus sebelum diajukan.',
     };
   }
 
@@ -41,32 +76,60 @@ function getScoreMeta(score, statusCode) {
     return {
       color: 'warning',
       label: 'Kemiripan Sedang',
-      description: 'Judul masih berpotensi diajukan, tetapi pastikan kebaruan kontribusi dan batas penelitian terlihat jelas.',
+      description:
+        'Judul masih berpotensi diajukan, tetapi pastikan kebaruan kontribusi dan batas penelitian terlihat jelas.',
     };
   }
 
   return {
     color: 'success',
     label: 'Kemiripan Rendah',
-    description: 'Judul relatif unik terhadap data TA yang tersedia dan dapat dilanjutkan ke tahap pengajuan.',
+    description:
+      'Judul relatif unik terhadap data TA yang tersedia dan dapat dilanjutkan ke tahap pengajuan.',
   };
 }
 
 function SimilarityGauge({ score, color }) {
   const colors = {
-    danger: { ring: '#ef4444', bg: '#fee2e2', text: '#dc2626' },
-    warning: { ring: '#f59e0b', bg: '#fef3c7', text: '#b45309' },
-    success: { ring: '#10b981', bg: '#d1fae5', text: '#065f46' },
+    danger: {
+      ring: '#f97316',
+      bg: '#ffedd5',
+      text: '#c2410c',
+    },
+    warning: {
+      ring: '#f59e0b',
+      bg: '#fef3c7',
+      text: '#b45309',
+    },
+    success: {
+      ring: '#10b981',
+      bg: '#d1fae5',
+      text: '#065f46',
+    },
   };
+
   const c = colors[color] || colors.success;
   const safeScore = Math.min(100, Math.max(0, Number(score) || 0));
   const circumference = 2 * Math.PI * 52;
   const offset = circumference - (safeScore / 100) * circumference;
 
   return (
-    <div className="gauge-wrap" style={{ '--gauge-bg': c.bg, '--gauge-text': c.text }}>
-      <svg width="130" height="130" viewBox="0 0 130 130" aria-label={`Skor kemiripan ${safeScore}%`}>
-        <circle cx="65" cy="65" r="52" fill="none" stroke="#f1f5f9" strokeWidth="10" />
+    <div className="gauge-wrap">
+      <svg
+        width="130"
+        height="130"
+        viewBox="0 0 130 130"
+        aria-label={`Skor kemiripan ${safeScore}%`}
+      >
+        <circle
+          cx="65"
+          cy="65"
+          r="52"
+          fill="none"
+          stroke="#f1f5f9"
+          strokeWidth="10"
+        />
+
         <circle
           cx="65"
           cy="65"
@@ -78,12 +141,31 @@ function SimilarityGauge({ score, color }) {
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           transform="rotate(-90 65 65)"
-          style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)' }}
+          style={{
+            transition: 'stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)',
+          }}
         />
-        <text x="65" y="59" textAnchor="middle" fill={c.text} fontSize="22" fontWeight="800" fontFamily="Poppins, sans-serif">
+
+        <text
+          x="65"
+          y="59"
+          textAnchor="middle"
+          fill={c.text}
+          fontSize="22"
+          fontWeight="800"
+          fontFamily="Poppins, sans-serif"
+        >
           {safeScore}%
         </text>
-        <text x="65" y="75" textAnchor="middle" fill="#94a3b8" fontSize="10" fontFamily="Poppins, sans-serif">
+
+        <text
+          x="65"
+          y="75"
+          textAnchor="middle"
+          fill="#94a3b8"
+          fontSize="10"
+          fontFamily="Poppins, sans-serif"
+        >
           Kemiripan
         </text>
       </svg>
@@ -97,26 +179,44 @@ function MatchCard({ match, delay }) {
     if (score >= 70) return 'warning';
     return 'success';
   };
+
   const color = getScoreColor(match.similarity);
 
   return (
-    <div className="match-card card fade-in" style={{ animationDelay: `${delay}s` }}>
+    <div
+      className="match-card card fade-in"
+      style={{
+        animationDelay: `${delay}s`,
+      }}
+    >
       <div className="match-card-header">
         <div className="match-rank">
           <span>#{match.rank}</span>
         </div>
+
         <div className="match-info">
           <p className="match-title">{match.judul}</p>
+
           <div className="match-meta">
-            <span><User size={12} /> {match.nama || '-'}</span>
+            <span>
+              <User size={12} />
+              {match.nama || '-'}
+            </span>
           </div>
         </div>
+
         <div className="match-score-wrap">
           <div className={`match-score match-score-${color}`}>
             {match.similarity}%
           </div>
+
           <div className="match-progress-mini">
-            <div className={`match-progress-fill match-fill-${color}`} style={{ width: `${match.similarity}%` }} />
+            <div
+              className={`match-progress-fill match-fill-${color}`}
+              style={{
+                width: `${match.similarity}%`,
+              }}
+            />
           </div>
         </div>
       </div>
@@ -146,22 +246,32 @@ export default function CekTAPage() {
   }, [judulTA, result]);
 
   const selectedTema = TEMA_OPTIONS.find((item) => item.value === tema);
-  const canSubmit = mode === 'submit' && result && !titleChangedAfterCheck;
+
+  const canSubmit =
+    mode === 'submit' &&
+    result &&
+    !titleChangedAfterCheck;
 
   useEffect(() => {
     const loadDosen = async () => {
       try {
         setAuthToken(token);
+
         const res = await api.get('/api/auth/dosen');
         const list = Array.isArray(res.data?.data) ? res.data.data : [];
-        setDosen(list.filter((item) => (item?.role || '').toLowerCase() === 'dosen'));
+
+        setDosen(
+          list.filter((item) => (item?.role || '').toLowerCase() === 'dosen')
+        );
       } catch (err) {
         console.error(err);
         toast.error('Gagal memuat daftar dosen pembimbing');
       }
     };
 
-    loadDosen();
+    if (token) {
+      loadDosen();
+    }
   }, [token]);
 
   const resetResultIfTitleChanges = (value) => {
@@ -188,15 +298,22 @@ export default function CekTAPage() {
 
     try {
       setAuthToken(token);
-      const res = await api.post('/api/ta/cek', { judul_baru: judulTA });
+
+      const res = await api.post('/api/ta/cek', {
+        judul_baru: judulTA,
+      });
+
       const backendData = res.data || {};
+
       const skor = Number(
         backendData.skor_kemiripan_tertinggi ||
-        backendData.max_score ||
-        backendData.similarity_score ||
-        0
+          backendData.max_score ||
+          backendData.similarity_score ||
+          0
       );
+
       const meta = getScoreMeta(skor, backendData.status_kode);
+
       const rekomendasi = Array.isArray(backendData.rekomendasi_mirip)
         ? backendData.rekomendasi_mirip
         : [];
@@ -222,10 +339,12 @@ export default function CekTAPage() {
       toast.success('Analisis kemiripan selesai.');
     } catch (error) {
       console.error(error);
+
       const errorMsg =
         error.response?.data?.pesan ||
         error.response?.data?.message ||
         'ML Service tidak tersedia. Pastikan Python service sudah berjalan.';
+
       toast.error(errorMsg);
       setHasSearched(false);
     } finally {
@@ -244,7 +363,10 @@ export default function CekTAPage() {
     setHasSearched(false);
 
     const fileInput = document.getElementById('file_pendukung');
-    if (fileInput) fileInput.value = '';
+
+    if (fileInput) {
+      fileInput.value = '';
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -287,15 +409,19 @@ export default function CekTAPage() {
 
       if (file) {
         const formData = new FormData();
+
         Object.entries(payload).forEach(([key, value]) => {
           if (value !== undefined && value !== null && value !== '') {
             formData.append(key, value);
           }
         });
+
         formData.append('file_pendukung', file);
 
         await api.post('/api/pengajuan', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
         });
       } else {
         await api.post('/api/pengajuan', payload);
@@ -306,7 +432,11 @@ export default function CekTAPage() {
       setMode('check');
     } catch (err) {
       console.error(err);
-      const serverMsg = err?.response?.data?.pesan || err?.response?.data?.message;
+
+      const serverMsg =
+        err?.response?.data?.pesan ||
+        err?.response?.data?.message;
+
       toast.error(serverMsg || 'Gagal mengirim pengajuan.');
     } finally {
       setSubmitting(false);
@@ -314,9 +444,18 @@ export default function CekTAPage() {
   };
 
   const colorMap = {
-    danger: { badgeClass: 'badge-red', icon: AlertCircle },
-    warning: { badgeClass: 'badge-amber', icon: TrendingUp },
-    success: { badgeClass: 'badge-green', icon: CheckCircle2 },
+    danger: {
+      badgeClass: 'badge-orange',
+      icon: AlertCircle,
+    },
+    warning: {
+      badgeClass: 'badge-amber',
+      icon: TrendingUp,
+    },
+    success: {
+      badgeClass: 'badge-green',
+      icon: CheckCircle2,
+    },
   };
 
   return (
@@ -324,11 +463,18 @@ export default function CekTAPage() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Cek & Ajukan Judul TA</h1>
-          <p className="page-subtitle">Cek kemiripan dahulu, lalu lanjutkan menjadi pengajuan bila judul sudah siap.</p>
+          <p className="page-subtitle">
+            Cek kemiripan dahulu, lalu lanjutkan menjadi pengajuan bila judul
+            sudah siap.
+          </p>
         </div>
       </div>
 
-      <div className="mode-switch" role="tablist" aria-label="Mode pengajuan">
+      <div
+        className="mode-switch"
+        role="tablist"
+        aria-label="Mode pengajuan"
+      >
         <button
           type="button"
           className={`mode-option ${mode === 'check' ? 'active' : ''}`}
@@ -337,6 +483,7 @@ export default function CekTAPage() {
           <Search size={17} />
           <span>Cek saja</span>
         </button>
+
         <button
           type="button"
           className={`mode-option ${mode === 'submit' ? 'active' : ''}`}
@@ -350,7 +497,9 @@ export default function CekTAPage() {
       <div className="info-banner">
         <Info size={16} />
         <p>
-          Pengajuan judul membutuhkan skor kemiripan dari pengecekan SBERT. Skor yang muncul di halaman ini akan ikut tersimpan agar dosen pembimbing dapat menilai keunikan judul.
+          Pengajuan judul membutuhkan skor kemiripan dari pengecekan SBERT.
+          Skor yang muncul di halaman ini akan ikut tersimpan agar dosen
+          pembimbing dapat menilai keunikan judul.
         </p>
       </div>
 
@@ -359,9 +508,13 @@ export default function CekTAPage() {
           <div className="section-icon">
             <FileText size={17} />
           </div>
+
           <div>
             <h3>Judul Tugas Akhir</h3>
-            <p>Masukkan judul yang akan dicek terhadap data TA Sistem Informasi Unand.</p>
+            <p>
+              Masukkan judul yang akan dicek terhadap data TA Sistem Informasi
+              Unand.
+            </p>
           </div>
         </div>
 
@@ -374,12 +527,18 @@ export default function CekTAPage() {
             onChange={(e) => resetResultIfTitleChanges(e.target.value)}
             rows={4}
           />
+
           <div className="textarea-footer">
             <span className={`char-count ${judulTA.length > 300 ? 'over' : ''}`}>
               {judulTA.length} / 300 karakter
             </span>
+
             {judulTA.length > 0 && (
-              <button className="btn btn-ghost clear-btn" onClick={resetForm} type="button">
+              <button
+                className="btn btn-ghost clear-btn"
+                onClick={resetForm}
+                type="button"
+              >
                 Hapus
               </button>
             )}
@@ -388,8 +547,11 @@ export default function CekTAPage() {
 
         <div className="action-row">
           <div className="action-tips">
-            <span>Judul yang lebih spesifik memberi hasil analisis yang lebih akurat.</span>
+            <span>
+              Judul yang lebih spesifik memberi hasil analisis yang lebih akurat.
+            </span>
           </div>
+
           <button
             id="cek-kemiripan-btn"
             className="btn btn-primary cek-btn"
@@ -398,9 +560,15 @@ export default function CekTAPage() {
             type="button"
           >
             {loading ? (
-              <><div className="spinner" /> Menganalisis...</>
+              <>
+                <div className="spinner" />
+                Menganalisis...
+              </>
             ) : (
-              <><Search size={17} /> Cek Kemiripan</>
+              <>
+                <Search size={17} />
+                Cek Kemiripan
+              </>
             )}
           </button>
         </div>
@@ -410,15 +578,33 @@ export default function CekTAPage() {
         <div className="loading-section fade-in">
           <div className="loading-steps">
             {[
-              { label: 'Membersihkan judul...', done: true },
-              { label: 'Membuat embedding SBERT...', done: true },
-              { label: 'Menghitung cosine similarity...', active: true },
-              { label: 'Menyiapkan rekomendasi terdekat...', pending: true },
+              {
+                label: 'Membersihkan judul...',
+                done: true,
+              },
+              {
+                label: 'Membuat embedding SBERT...',
+                done: true,
+              },
+              {
+                label: 'Menghitung cosine similarity...',
+                active: true,
+              },
+              {
+                label: 'Menyiapkan rekomendasi terdekat...',
+                pending: true,
+              },
             ].map((step) => (
-              <div key={step.label} className={`loading-step ${step.done ? 'done' : step.active ? 'active' : 'pending'}`}>
+              <div
+                key={step.label}
+                className={`loading-step ${
+                  step.done ? 'done' : step.active ? 'active' : 'pending'
+                }`}
+              >
                 <div className="step-indicator">
                   {step.done ? 'OK' : step.active ? <div className="mini-spinner" /> : '-'}
                 </div>
+
                 <span>{step.label}</span>
               </div>
             ))}
@@ -430,29 +616,58 @@ export default function CekTAPage() {
         <div className="results-section fade-in">
           <div className="result-summary card">
             <div className="result-summary-left">
-              <SimilarityGauge score={result.score} color={result.color} />
+              <SimilarityGauge
+                score={result.score}
+                color={result.color}
+              />
             </div>
+
             <div className="result-summary-right">
               <div className="result-header-row">
                 <h3>Hasil Analisis Kemiripan</h3>
-                <span className={`badge ${colorMap[result.color].badgeClass}`}>
-                  {result.label}
-                </span>
+
+                {(() => {
+                  const ResultIcon = colorMap[result.color].icon;
+
+                  return (
+                    <span className={`badge ${colorMap[result.color].badgeClass}`}>
+                      <ResultIcon size={14} />
+                      {result.label}
+                    </span>
+                  );
+                })()}
               </div>
-              <p className="result-description">{result.description}</p>
+
+              <p className="result-description">
+                {result.description}
+              </p>
 
               <div className="result-stats-row">
                 <div className="result-stat">
-                  <span className="result-stat-val">{result.matches.length}</span>
-                  <span className="result-stat-lbl">TA Mirip</span>
+                  <span className="result-stat-val">
+                    {result.matches.length}
+                  </span>
+                  <span className="result-stat-lbl">
+                    TA Mirip
+                  </span>
                 </div>
+
                 <div className="result-stat">
-                  <span className="result-stat-val">{result.score}%</span>
-                  <span className="result-stat-lbl">Skor Tertinggi</span>
+                  <span className="result-stat-val">
+                    {result.score}%
+                  </span>
+                  <span className="result-stat-lbl">
+                    Skor Tertinggi
+                  </span>
                 </div>
+
                 <div className="result-stat">
-                  <span className="result-stat-val">{mode === 'submit' ? 'Siap' : 'Cek'}</span>
-                  <span className="result-stat-lbl">Mode Saat Ini</span>
+                  <span className="result-stat-val">
+                    {mode === 'submit' ? 'Siap' : 'Cek'}
+                  </span>
+                  <span className="result-stat-lbl">
+                    Mode Saat Ini
+                  </span>
                 </div>
               </div>
 
@@ -461,9 +676,16 @@ export default function CekTAPage() {
                   <span>Tingkat Kemiripan</span>
                   <span>{result.score}%</span>
                 </div>
+
                 <div className="result-bar-bg">
-                  <div className={`result-bar-fill result-fill-${result.color}`} style={{ width: `${result.score}%` }} />
+                  <div
+                    className={`result-bar-fill result-fill-${result.color}`}
+                    style={{
+                      width: `${result.score}%`,
+                    }}
+                  />
                 </div>
+
                 <div className="result-bar-scale">
                   <span>0%</span>
                   <span className="scale-low">Rendah</span>
@@ -478,7 +700,8 @@ export default function CekTAPage() {
           {titleChangedAfterCheck && (
             <div className="result-warning">
               <AlertCircle size={16} />
-              Judul berubah setelah pengecekan. Cek ulang agar skor yang disimpan sesuai dengan judul terbaru.
+              Judul berubah setelah pengecekan. Cek ulang agar skor yang
+              disimpan sesuai dengan judul terbaru.
             </div>
           )}
 
@@ -487,7 +710,10 @@ export default function CekTAPage() {
               <Search size={14} />
               Judul yang dianalisis:
             </div>
-            <p className="query-text">"{result.checkedTitle}"</p>
+
+            <p className="query-text">
+              "{result.checkedTitle}"
+            </p>
           </div>
 
           <div className="match-list-section">
@@ -496,22 +722,39 @@ export default function CekTAPage() {
                 <BookOpen size={17} />
                 Daftar TA dengan Topik Mirip
               </h3>
-              <span className="badge badge-sky">{result.matches.length} hasil</span>
+
+              <span className="badge badge-sky">
+                {result.matches.length} hasil
+              </span>
             </div>
 
             <div className="match-list">
-              {result.matches.map((match, i) => (
-                <MatchCard key={`${match.judul}-${i}`} match={match} delay={i * 0.1} />
+              {result.matches.map((match, index) => (
+                <MatchCard
+                  key={`${match.judul}-${index}`}
+                  match={match}
+                  delay={index * 0.1}
+                />
               ))}
             </div>
           </div>
 
           {mode === 'check' && (
             <div className="result-actions">
-              <button className="btn btn-ghost" onClick={resetForm} id="cek-ulang-btn" type="button">
+              <button
+                className="btn btn-ghost"
+                onClick={resetForm}
+                id="cek-ulang-btn"
+                type="button"
+              >
                 Cek Judul Lain
               </button>
-              <button className="btn btn-primary" onClick={() => setMode('submit')} type="button">
+
+              <button
+                className="btn btn-primary"
+                onClick={() => setMode('submit')}
+                type="button"
+              >
                 <Send size={16} />
                 Lanjut Ajukan
               </button>
@@ -521,15 +764,23 @@ export default function CekTAPage() {
       )}
 
       {mode === 'submit' && (
-        <form className="submission-panel card fade-in" onSubmit={handleSubmit}>
+        <form
+          className="submission-panel card fade-in"
+          onSubmit={handleSubmit}
+        >
           <div className="submission-panel-header">
             <div className="section-icon">
               <ClipboardCheck size={17} />
             </div>
+
             <div>
               <h3>Data Pengajuan</h3>
-              <p>Lengkapi data ini setelah judul dicek. Skor akan tersimpan bersama pengajuan.</p>
+              <p>
+                Lengkapi data ini setelah judul dicek. Skor akan tersimpan
+                bersama pengajuan.
+              </p>
             </div>
+
             {result && !titleChangedAfterCheck && (
               <span className={`score-pill score-pill-${result.color}`}>
                 Skor {result.score}%
@@ -545,27 +796,71 @@ export default function CekTAPage() {
           )}
 
           <div className="form-group">
-            <label>Tema TA <span>*</span></label>
+            <label>
+              Tema TA <span>*</span>
+            </label>
+
             <div className="theme-grid">
-              {TEMA_OPTIONS.map((option) => (
-                <label key={option.value} className={`theme-option ${tema === option.value ? 'selected' : ''}`}>
-                  <input
-                    type="radio"
-                    name="tema"
-                    value={option.value}
-                    checked={tema === option.value}
-                    onChange={(event) => setTema(event.target.value)}
-                  />
-                  <span className="theme-code">{option.label}</span>
-                  <span className="theme-desc">{option.desc}</span>
-                </label>
-              ))}
+              {TEMA_OPTIONS.map((option) => {
+                const ThemeIcon = option.icon;
+
+                return (
+                  <label
+                    key={option.value}
+                    className={`theme-option ${tema === option.value ? 'selected' : ''}`}
+                  >
+                    <input
+                      type="radio"
+                      name="tema"
+                      value={option.value}
+                      checked={tema === option.value}
+                      onChange={(event) => setTema(event.target.value)}
+                    />
+
+                    <div className="theme-top">
+                      <div className="theme-icon">
+                        <ThemeIcon size={21} />
+                      </div>
+
+                      <div className="theme-radio">
+                        <span></span>
+                      </div>
+                    </div>
+
+                    <div className="theme-body">
+                      <span className="theme-code">
+                        {option.label}
+                      </span>
+
+                      <span className="theme-desc">
+                        {option.desc}
+                      </span>
+
+                      <span className="theme-detail">
+                        {option.detail}
+                      </span>
+                    </div>
+                  </label>
+                );
+              })}
             </div>
-            {selectedTema && <small>Dipilih: {selectedTema.label} ({selectedTema.desc})</small>}
+
+            {selectedTema ? (
+              <small className="theme-selected-info">
+                Dipilih: {selectedTema.label} — {selectedTema.desc}
+              </small>
+            ) : (
+              <small className="theme-selected-info">
+                Pilih salah satu tema agar pengajuan bisa diproses.
+              </small>
+            )}
           </div>
 
           <div className="form-group">
-            <label htmlFor="abstract">Ringkasan</label>
+            <label htmlFor="abstract">
+              Ringkasan
+            </label>
+
             <textarea
               id="abstract"
               value={abstract}
@@ -573,38 +868,59 @@ export default function CekTAPage() {
               placeholder="Tuliskan ringkasan singkat mengenai judul yang diajukan"
               rows="5"
             />
-            <small>Opsional, tetapi membantu dosen memahami ruang lingkup usulan.</small>
+
+            <small>
+              Opsional, tetapi membantu dosen memahami ruang lingkup usulan.
+            </small>
           </div>
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="pembimbing1">Pembimbing 1 <span>*</span></label>
+              <label htmlFor="pembimbing1">
+                Pembimbing 1 <span>*</span>
+              </label>
+
               <select
                 id="pembimbing1"
                 value={pembimbing1}
                 onChange={(e) => setPembimbing1(e.target.value)}
               >
-                <option value="">Pilih pembimbing 1</option>
+                <option value="">
+                  Pilih pembimbing 1
+                </option>
+
                 {dosen
                   .filter((d) => String(d.id) !== String(pembimbing2))
                   .map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.nama} ({d.username})
-                  </option>
-                ))}
+                    <option
+                      key={d.id}
+                      value={d.id}
+                    >
+                      {d.nama} ({d.username})
+                    </option>
+                  ))}
               </select>
             </div>
 
             <div className="form-group">
-              <label htmlFor="pembimbing2">Pembimbing 2</label>
+              <label htmlFor="pembimbing2">
+                Pembimbing 2
+              </label>
+
               <select
                 id="pembimbing2"
                 value={pembimbing2}
                 onChange={(e) => setPembimbing2(e.target.value)}
               >
-                <option value="">Opsional</option>
+                <option value="">
+                  Opsional
+                </option>
+
                 {dosen.map((d) => (
-                  <option key={d.id} value={d.id}>
+                  <option
+                    key={d.id}
+                    value={d.id}
+                  >
                     {d.nama} ({d.username})
                   </option>
                 ))}
@@ -613,33 +929,59 @@ export default function CekTAPage() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="file_pendukung">File Pendukung</label>
-            <div className="file-box">
-              <Upload size={18} />
+            <label htmlFor="file_pendukung">
+              File Pendukung
+            </label>
+
+            <label
+              htmlFor="file_pendukung"
+              className="file-upload-dropzone"
+              role="button"
+              tabIndex={0}
+            >
               <input
                 id="file_pendukung"
                 type="file"
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
               />
-            </div>
-            <small>{file ? `File dipilih: ${file.name}` : 'Opsional. Lampirkan proposal, referensi, atau dokumen pendukung.'}</small>
+
+              <div className="file-upload-title">
+                {file ? file.name : 'Klik area ini untuk upload file'}
+              </div>
+
+              <div className="file-upload-subtitle">
+                {file ? 'File siap dikirim' : 'Tanpa tombol choose file, cukup klik area ini'}
+              </div>
+            </label>
+
+            <small>
+              Opsional. Lampirkan proposal, referensi, atau dokumen pendukung.
+            </small>
           </div>
 
           <div className="submission-summary">
             <div>
               <Layers size={16} />
               <span>Tema</span>
-              <strong>{selectedTema ? `${selectedTema.label} (${selectedTema.desc})` : '-'}</strong>
+              <strong>
+                {selectedTema ? `${selectedTema.label} (${selectedTema.desc})` : '-'}
+              </strong>
             </div>
+
             <div>
               <Search size={16} />
               <span>Skor Kemiripan</span>
-              <strong>{result && !titleChangedAfterCheck ? `${result.score}%` : 'Belum valid'}</strong>
+              <strong>
+                {result && !titleChangedAfterCheck ? `${result.score}%` : 'Belum valid'}
+              </strong>
             </div>
           </div>
 
           <div className="form-action">
-            <button type="submit" disabled={submitting || !canSubmit}>
+            <button
+              type="submit"
+              disabled={submitting || !canSubmit}
+            >
               {submitting ? 'Mengirim...' : 'Ajukan Judul'}
             </button>
           </div>
@@ -651,8 +993,13 @@ export default function CekTAPage() {
           <div className="empty-icon">
             <Search size={36} strokeWidth={1.5} />
           </div>
+
           <h3>Siap Menganalisis Judul TA</h3>
-          <p>Masukkan judul, lalu cek kemiripan untuk melihat skor dan daftar TA yang paling mendekati.</p>
+
+          <p>
+            Masukkan judul, lalu cek kemiripan untuk melihat skor dan daftar TA
+            yang paling mendekati.
+          </p>
         </div>
       )}
     </div>
