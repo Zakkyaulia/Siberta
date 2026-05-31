@@ -36,11 +36,6 @@ const INFO_FIELDS = [
     key: 'email',
   },
   {
-    icon: Award,
-    label: 'Dosen Pembimbing',
-    key: 'pembimbing',
-  },
-  {
     icon: CheckCircle2,
     label: 'Status Akademik',
     key: 'status',
@@ -294,17 +289,6 @@ export default function ProfilPage() {
                     value={formData.angkatan}
                     onChange={handleChange}
                     placeholder="Contoh: 2022"
-                  />
-                </div>
-
-                <div className="profil-form-group">
-                  <label>Dosen Pembimbing</label>
-                  <input
-                    type="text"
-                    name="pembimbing"
-                    value={formData.pembimbing}
-                    onChange={handleChange}
-                    placeholder="Nama dosen pembimbing"
                   />
                 </div>
               </div>

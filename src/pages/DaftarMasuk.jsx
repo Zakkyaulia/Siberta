@@ -9,6 +9,7 @@ import {
   Search,
   UserCheck,
   Users,
+  X,
 } from 'lucide-react';
 import './DaftarMasuk.css';
 
@@ -146,8 +147,8 @@ function ReviewModal({ open, onClose, submission, onSubmitted, onDownloadFile })
             <p>{submission.judul || '-'}</p>
           </div>
 
-          <button type="button" className="review-close" onClick={onClose}>
-            x
+          <button type="button" className="review-close" onClick={onClose} aria-label="Tutup modal review">
+            <X size={18} strokeWidth={2.3} />
           </button>
         </div>
 

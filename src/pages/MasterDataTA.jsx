@@ -198,7 +198,7 @@ export default function MasterDataTA() {
       <div className="master-card">
         <div className="master-header">
           <div>
-            <h2>Arsip TA Tersinkron</h2>
+            <h2>Arsip TA</h2>
             <p>Data tugas akhir resmi yang sudah disetujui pembimbing dan disinkronkan oleh departemen.</p>
           </div>
 

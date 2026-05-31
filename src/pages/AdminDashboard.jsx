@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Users,
   Database,
   ShieldCheck,
-  RefreshCw,
   UserCog,
   Activity,
   Layers,
@@ -14,9 +13,40 @@ import {
   Info,
 } from 'lucide-react';
 import './AdminDashboard.css';
+import api, { setAuthToken } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const { token } = useAuth();
+  const [totalPengguna, setTotalPengguna] = useState('-');
+  const [totalDataTA, setTotalDataTA] = useState('-');
+
+  useEffect(() => {
+    const loadDashboardStats = async () => {
+      setAuthToken(token);
+
+      try {
+        const resUsers = await api.get('/api/admin/users');
+        const totalUsers = Array.isArray(resUsers.data?.data) ? resUsers.data.data.length : 0;
+        setTotalPengguna(totalUsers);
+      } catch (error) {
+        console.error(error);
+        setTotalPengguna('-');
+      }
+
+      try {
+        const resTA = await api.get('/api/admin/master-titles');
+        const totalTA = Array.isArray(resTA.data?.data) ? resTA.data.data.length : 0;
+        setTotalDataTA(totalTA);
+      } catch (error) {
+        console.error(error);
+        setTotalDataTA('-');
+      }
+    };
+
+    if (token) loadDashboardStats();
+  }, [token]);
 
   const adminMenus = [
     {
@@ -26,7 +56,7 @@ export default function AdminDashboard() {
       path: '/dashboard/manajemen-user',
     },
     {
-      title: 'Master Data TA',
+      title: 'Arsip TA',
       desc: 'Kelola daftar judul, tema, dan data tugas akhir.',
       icon: Database,
       path: '/dashboard/master-data',
@@ -37,25 +67,20 @@ export default function AdminDashboard() {
       icon: ShieldCheck,
       path: '/dashboard/validasi',
     },
-    {
-      title: 'Sinkronisasi ML',
-      desc: 'Sinkronkan data TA untuk kebutuhan model kemiripan.',
-      icon: RefreshCw,
-      path: '/dashboard/sync-ml',
-    },
+  
   ];
 
   const stats = [
     {
-      label: 'Total Modul',
-      value: adminMenus.length,
-      desc: 'Fitur admin tersedia',
+      label: 'Total Data TA',
+      value: totalDataTA,
+      desc: 'Jumlah data tugas akhir tersimpan',
       icon: Layers,
     },
     {
-      label: 'Role Sistem',
-      value: 3,
-      desc: 'Admin, dosen, mahasiswa',
+      label: 'Total Pengguna',
+      value: totalPengguna,
+      desc: 'Jumlah seluruh pengguna terdaftar',
       icon: UserCog,
     },
     {

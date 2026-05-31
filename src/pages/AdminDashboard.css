@@ -189,13 +189,13 @@ textarea {
 
 .admin-menu-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
 }
 
 .admin-menu-card {
   width: 100%;
-  min-height: 190px;
+  min-height: 180px;
   padding: 20px;
   border-radius: 18px;
   background: #f8fafc;
@@ -260,6 +260,7 @@ textarea {
   font-size: 14px;
   line-height: 1.6;
   color: #64748b;
+  min-height: 44px;
 }
 
 /* Info */

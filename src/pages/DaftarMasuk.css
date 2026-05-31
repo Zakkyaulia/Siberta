@@ -241,13 +241,36 @@ select {
 }
 
 .review-modal {
-  width: 100%;
-  max-width: 560px;
+  width: min(920px, 96vw);
+  max-width: 920px;
+  max-height: 88vh;
+  overflow-y: auto;
+  scrollbar-color: #9ca3af #e5e7eb;
+  scrollbar-width: thin;
   background: #ffffff;
   border-radius: 18px;
-  padding: 24px;
+  padding: 28px;
   box-shadow: 0 24px 70px rgba(15, 23, 42, 0.25);
   box-sizing: border-box;
+}
+
+.review-modal::-webkit-scrollbar {
+  width: 10px;
+}
+
+.review-modal::-webkit-scrollbar-track {
+  background: #e5e7eb;
+  border-radius: 999px;
+}
+
+.review-modal::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 999px;
+  border: 2px solid #e5e7eb;
+}
+
+.review-modal::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
 }
 
 .review-modal-header {
@@ -273,19 +296,28 @@ select {
 }
 
 .review-close {
-  width: 34px;
-  height: 34px;
-  border: none;
+  width: 38px;
+  height: 38px;
+  border: 1px solid #dbe3ec;
   border-radius: 10px;
-  background: #f1f5f9;
-  color: #334155;
-  font-size: 24px;
-  line-height: 1;
+  background: #f8fafc;
+  color: #475569;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .review-close:hover {
-  background: #e2e8f0;
+  background: #eef2f7;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+.review-close:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(100, 116, 139, 0.2);
 }
 
 .review-info {
@@ -296,7 +328,8 @@ select {
 }
 
 .review-info-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
 }
 
 .review-info div {
@@ -522,6 +555,18 @@ select {
 
 .review-file-list button:hover {
   background: #e0f2fe;
+}
+
+@media (max-width: 900px) {
+  .review-modal {
+    width: min(96vw, 760px);
+    max-width: 760px;
+    padding: 22px;
+  }
+
+  .review-info-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {

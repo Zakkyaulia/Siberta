@@ -118,7 +118,7 @@ const menuConfig = {
     {
       to: '/dashboard/master-data',
       icon: Database,
-      label: 'Arsip TA Tersinkron',
+      label: 'Arsip TA',
       desc: 'Data TA resmi',
     },
     {
@@ -151,7 +151,7 @@ const menuConfig = {
     {
       to: '/dashboard/master-data',
       icon: Database,
-      label: 'Arsip TA Tersinkron',
+      label: 'Arsip TA',
       desc: 'Data TA resmi',
     },
     {
