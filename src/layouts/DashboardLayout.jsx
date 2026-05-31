@@ -88,12 +88,12 @@ const menuConfig = {
       label: 'Daftar Masuk',
       desc: 'Review judul MHS',
     },
-    {
-      to: '/dashboard/log-bimbingan',
-      icon: BookOpen,
-      label: 'Log Bimbingan',
-      desc: 'Catatan konsultasi',
-    },
+    // {
+    //   to: '/dashboard/log-bimbingan',
+    //   icon: BookOpen,
+    //   label: 'Log Bimbingan',
+    //   desc: 'Catatan konsultasi',
+    // },
   ],
 
   admin: [
