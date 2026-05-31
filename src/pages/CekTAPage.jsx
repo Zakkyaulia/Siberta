@@ -585,7 +585,9 @@ export default function CekTAPage() {
                 onChange={(e) => setPembimbing1(e.target.value)}
               >
                 <option value="">Pilih pembimbing 1</option>
-                {dosen.map((d) => (
+                {dosen
+                  .filter((d) => String(d.id) !== String(pembimbing2))
+                  .map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.nama} ({d.username})
                   </option>
